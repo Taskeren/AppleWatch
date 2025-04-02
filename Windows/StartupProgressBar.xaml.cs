@@ -180,16 +180,16 @@ namespace Kanye4King
 
                     Checker.CheckSubs();
                     Instance.Dispatcher.Invoke(() => TaskDescription.Content = "Checking for updates");
-                    if (!Updater.IsLatest())
-                    {
-                        Update();
-                        Instance.Dispatcher.Invoke(() =>
-                        {
-                            Process.GetCurrentProcess().CloseMainWindow();
-                            Application.Current.Shutdown();
-                        });
-                        return;
-                    }
+                    //if (!Updater.IsLatest())
+                    //{
+                    //    Update();
+                    //    Instance.Dispatcher.Invoke(() =>
+                    //    {
+                    //        Process.GetCurrentProcess().CloseMainWindow();
+                    //        Application.Current.Shutdown();
+                    //    });
+                    //    return;
+                    //}
 
                     Instance.Dispatcher.Invoke(() => TaskDescription.Content = "Checking the executable");
                     if (!Updater.IsProtected())
