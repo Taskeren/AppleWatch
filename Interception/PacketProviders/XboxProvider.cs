@@ -1,7 +1,6 @@
 ﻿using Kanye4King.Interception.Modules;
 using Kanye4King.Models;
 using Kanye4King.Utility;
-
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -12,7 +11,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Navigation;
-
 using WindivertDotnet;
 
 namespace Kanye4King.Interception.PacketProviders
@@ -26,7 +24,8 @@ namespace Kanye4King.Interception.PacketProviders
 
         protected override WinDivert CreateInstance()
         {
-            return Divert = new WinDivert(Filter.True.And(x => x.IsUdp && x.Network.RemotePort == 3074), WinDivertLayer.Network);
+            return Divert = new WinDivert(Filter.True.And(x => x.IsUdp && x.Network.RemotePort == 3074),
+                WinDivertLayer.Network);
         }
 
         public class ResyncInfo
@@ -40,7 +39,8 @@ namespace Kanye4King.Interception.PacketProviders
             public bool Active => InboundActive || OutboundActive;
         }
 
-        public Dictionary<string, ResyncInfo> Resyncs { get; set; } = new ();
+        public Dictionary<string, ResyncInfo> Resyncs { get; set; } = new();
+
         public override bool AllowPacket(Packet p)
         {
             var id = p.GetPveId();
@@ -60,7 +60,8 @@ namespace Kanye4King.Interception.PacketProviders
             // Resync logic
             if ((p.Inbound && resync.InboundActive) || (p.Outbound && resync.OutboundActive))
             {
-                var con = Connections[p.RemoteAddress].TakeLast(100).Where(x => resync.LastStart <= x.CreatedAt).ToArray();
+                var con = Connections[p.RemoteAddress].TakeLast(100).Where(x => resync.LastStart <= x.CreatedAt)
+                    .ToArray();
 
                 if (p.Inbound && resync.InboundActive)
                 {
@@ -69,8 +70,8 @@ namespace Kanye4King.Interception.PacketProviders
                     if (id < 5) return true;
 
                     // filter out data packets
-                    if (id > 40 && 
-                        (p.Length == 233 || !con.Any(x => x.Length == 233)) && 
+                    if (id > 40 &&
+                        (p.Length == 233 || !con.Any(x => x.Length == 233)) &&
                         p.CreatedAt - resync.LastStart < TimeSpan.FromSeconds(1))
                         return p.Length == 42 || p.Length == 128 || p.Length == 136 || p.Length == 233;
 
@@ -79,8 +80,8 @@ namespace Kanye4King.Interception.PacketProviders
                     if (inbound.Count > 1)
                     {
                         // if ul resync succeeded and dl still fails it will pass 1 ul
-                        if (!resync.OutboundActive && inbound.Count > 2 && 
-                            p.CreatedAt - resync.LastStart > TimeSpan.FromSeconds(1.5) && 
+                        if (!resync.OutboundActive && inbound.Count > 2 &&
+                            p.CreatedAt - resync.LastStart > TimeSpan.FromSeconds(1.5) &&
                             inbound.TakeLast(3).All(x => x.Length < 52))
                         {
                             var ul = con.FirstOrDefault(x => x.Outbound && !x.IsSent);
@@ -114,7 +115,8 @@ namespace Kanye4King.Interception.PacketProviders
             }
 
             // Check for new resyncs
-            else if ((PveModule.AutoResync || PveModule.SlowInbound || PveModule.SlowOutbound) && p.IsPveReconnectRequest())
+            else if ((PveModule.AutoResync || PveModule.SlowInbound || PveModule.SlowOutbound) &&
+                     p.IsPveReconnectRequest())
             {
                 var dir = Connections[p.RemoteAddress].TakeLast(100).Where(x => x.Inbound == p.Inbound).ToList();
                 if (dir.Count > 1 && dir[^2].IsPveReconnectRequest() && dir[^2].Length != p.Length)
@@ -131,6 +133,7 @@ namespace Kanye4King.Interception.PacketProviders
 
         Task poll;
         CancellationTokenSource cts;
+
         public override void StorePacket(Packet p)
         {
             base.StorePacket(p);
@@ -150,7 +153,8 @@ namespace Kanye4King.Interception.PacketProviders
                     var token = cts.Token;
                     for (int i = 0; i < 20; i++)
                     {
-                        if (token.IsCancellationRequested || (D2CharacterTracker.User is null && !await D2CharacterTracker.TryLoadFromConfig())) return;
+                        if (token.IsCancellationRequested || (D2CharacterTracker.User is null &&
+                                                              !await D2CharacterTracker.TryLoadFromConfig())) return;
 
                         await D2CharacterTracker.Update();
                         await Task.Delay(20000, cts.Token);
@@ -162,6 +166,7 @@ namespace Kanye4King.Interception.PacketProviders
         }
 
         TimeSpan lastResult = TimeSpan.Zero;
+
         public TimeSpan InstanceDuration()
         {
             var dif = DateTime.Now - last;
@@ -175,16 +180,18 @@ namespace Kanye4King.Interception.PacketProviders
         }
 
         static DateTime start = DateTime.MinValue;
+
         public static DateTime InstanceStarted
         {
             get { return start; }
-            set 
+            set
             {
                 if (start == value) return;
                 start = value;
                 Logger.Debug($"Instance start set to {value}");
             }
         }
+
         DateTime last;
     }
 }

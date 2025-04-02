@@ -1,6 +1,5 @@
 ﻿using Kanye4King.Interception.Modules;
 using Kanye4King.Interception.PacketProviders;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,6 +25,7 @@ namespace Kanye4King.Interception
 
 
         private static bool init = false;
+
         public static void Init()
         {
             if (init) return;

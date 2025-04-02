@@ -1,6 +1,5 @@
 ﻿using Kanye4King.Controls;
 using Kanye4King.Database;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +7,6 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-
 using static System.Net.Mime.MediaTypeNames;
 
 namespace Kanye4King
@@ -16,6 +14,7 @@ namespace Kanye4King
     public static class Logger
     {
         public static bool Enabled = true;
+
         private static void Log(string text, LogLevel level)
         {
             if (!Enabled) return;

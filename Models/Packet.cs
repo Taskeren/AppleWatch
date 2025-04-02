@@ -1,5 +1,4 @@
 ﻿using Kanye4King.Interception;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +6,6 @@ using System.Net;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-
 using WindivertDotnet;
 
 namespace Kanye4King.Models
@@ -42,7 +40,8 @@ namespace Kanye4King.Models
         {
         }
 
-        public unsafe Packet(WinDivertPacket packet, WinDivertAddress addr, int start, int finish, PacketProviderBase source)
+        public unsafe Packet(WinDivertPacket packet, WinDivertAddress addr, int start, int finish,
+            PacketProviderBase source)
         {
             CreatedAt = DateTime.Now;
             SourceProvider = source;
@@ -90,6 +89,7 @@ namespace Kanye4King.Models
                 Flags |= TcpFlags.ACK;
                 AckNum = ParseResult.TcpHeader->AckNum;
             }
+
             SeqNum = ParseResult.TcpHeader->SeqNum;
             if (ParseResult.TcpHeader->Fin)
                 Flags |= TcpFlags.FIN;

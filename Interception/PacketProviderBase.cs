@@ -1,9 +1,7 @@
 ﻿using Microsoft.Extensions.Logging.Abstractions;
-
 using Kanye4King.Database;
 using Kanye4King.Interception.Modules;
 using Kanye4King.Models;
-
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -15,7 +13,6 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using WindivertDotnet;
-
 using static System.Net.Mime.MediaTypeNames;
 
 namespace Kanye4King.Interception
@@ -25,7 +22,7 @@ namespace Kanye4King.Interception
         public string Name { get; set; }
         public WinDivert Divert { get; set; }
         public bool IsEnabled => subs.Any();
-        
+
         public List<Packet> CurrentQueue { get; set; }
         public Dictionary<string, List<Packet>> Connections { get; set; }
         public int BufferSeconds = 5;
@@ -38,7 +35,6 @@ namespace Kanye4King.Interception
 
         protected abstract WinDivert CreateInstance();
 
-        
 
         public PacketProviderBase(string name, int fromPort, int toPort, bool isTcp = false)
         {
@@ -53,8 +49,6 @@ namespace Kanye4King.Interception
 
         private HashSet<PacketModuleBase> subs = new HashSet<PacketModuleBase>();
         private CancellationTokenSource cts;
-
-        
 
 
         public async Task SendPacket(Packet packet, bool force = false)
@@ -71,15 +65,17 @@ namespace Kanye4King.Interception
             packet.IsSent = true;
             packet.IsSaved = packet.Delayed = false;
         }
+
         public virtual bool AllowPacket(Packet p)
         {
             return !subs.Any(x => !x.AllowPacket(p));
         }
+
         public virtual void StorePacket(Packet p)
         {
             CurrentQueue.Add(p);
             var r = p.RemoteAddress;
-            if (!Connections.ContainsKey(r)) 
+            if (!Connections.ContainsKey(r))
                 Connections[r] = new List<Packet>();
 
             Connections[r].Add(p);
@@ -116,6 +112,7 @@ namespace Kanye4King.Interception
                         Logger.Error(e);
                         throw e;
                     }
+
                     await Task.Delay(100);
                 }
             }
@@ -146,7 +143,9 @@ namespace Kanye4King.Interception
                         if (isTcp) p.onBlock();
                     }
                 }
-                catch (TaskCanceledException) { }
+                catch (TaskCanceledException)
+                {
+                }
                 catch (Exception e)
                 {
                     var t = e.GetType();
@@ -185,6 +184,7 @@ namespace Kanye4King.Interception
             addr.Dispose();
             Logger.Debug($"{Name} provider: Stopped");
         }
+
         private async Task SavePoll(CancellationToken ct)
         {
             while (CurrentQueue is null || Connections is null)
@@ -200,8 +200,8 @@ namespace Kanye4King.Interception
                 {
                     Packet[] copy = CurrentQueue.ToArray();
 
-                    var remove = copy.Where(x => 
-                        x.CreatedAt < DateTime.Now - TimeSpan.FromSeconds(BufferSeconds) && 
+                    var remove = copy.Where(x =>
+                        x.CreatedAt < DateTime.Now - TimeSpan.FromSeconds(BufferSeconds) &&
                         !x.IsSaved && !x.Delayed);
 
                     if (remove.Any())
@@ -233,8 +233,10 @@ namespace Kanye4King.Interception
 
                     await Task.Delay(750, ct);
                 }
-                catch (TaskCanceledException) { }
-                catch (NullReferenceException) 
+                catch (TaskCanceledException)
+                {
+                }
+                catch (NullReferenceException)
                 {
                     for (int i = 0; i < 5; i++)
                     {
@@ -245,7 +247,9 @@ namespace Kanye4King.Interception
                                 CurrentQueue.Remove(c);
                             break;
                         }
-                        catch { }
+                        catch
+                        {
+                        }
                     }
                 }
                 catch (Exception e)
@@ -256,6 +260,7 @@ namespace Kanye4King.Interception
 
             Logger.Debug($"{Name} provider: Stopped saving packets");
         }
+
         private async Task DelayPoll(CancellationToken ct)
         {
             Delay = new List<Packet>();
@@ -281,7 +286,9 @@ namespace Kanye4King.Interception
                     StorePacket(p);
                     SendPacket(p);
                 }
-                catch (TaskCanceledException) { }
+                catch (TaskCanceledException)
+                {
+                }
                 catch (Exception e)
                 {
                     Logger.Error($"{Name} delay: {e}");
@@ -300,19 +307,19 @@ namespace Kanye4King.Interception
             if (Config.Instance.Settings.DB_SavePackets)
             {
                 var temp = unsaved.Where(x => !x.IsSaved)
-                .Select(x => new DbPacket()
-                {
-                    CreatedAt = x.CreatedAt,
-                    Payload = x.Payload.ToArray(),
-                    Length = x.Length,
-                    IsInbound = x.Inbound,
-                    IsSent = x.IsSent,
-                    SrcAddr = x.SrcAddr.ToString(),
-                    DstAddr = x.DstAddr.ToString(),
-                    SrcPort = x.SrcPort,
-                    DstPort = x.DstPort,
-                    Flags = x.BuildTcpFlagsString(),
-                });
+                    .Select(x => new DbPacket()
+                    {
+                        CreatedAt = x.CreatedAt,
+                        Payload = x.Payload.ToArray(),
+                        Length = x.Length,
+                        IsInbound = x.Inbound,
+                        IsSent = x.IsSent,
+                        SrcAddr = x.SrcAddr.ToString(),
+                        DstAddr = x.DstAddr.ToString(),
+                        SrcPort = x.SrcPort,
+                        DstPort = x.DstPort,
+                        Flags = x.BuildTcpFlagsString(),
+                    });
 
                 using var db = new Kanye4KingDbContext();
                 db.ChangeTracker.AutoDetectChangesEnabled = false;
@@ -327,8 +334,10 @@ namespace Kanye4King.Interception
             }
         }
 
-        static Dictionary<string, DateTime> lastDelays = new ();
-        public void DelayPacket(Packet packet, TimeSpan delay = default, bool addFromLatest = false, bool sameDirection = false)
+        static Dictionary<string, DateTime> lastDelays = new();
+
+        public void DelayPacket(Packet packet, TimeSpan delay = default, bool addFromLatest = false,
+            bool sameDirection = false)
         {
             if (Delay.Count > 2048)
             {
@@ -354,7 +363,7 @@ namespace Kanye4King.Interception
                 }
 
                 var last = con.LastOrDefault();
-                if (lastDelays.TryGetValue($"{packet.RemoteAddress}{packet.Inbound}", out var lastDelay) && 
+                if (lastDelays.TryGetValue($"{packet.RemoteAddress}{packet.Inbound}", out var lastDelay) &&
                     DateTime.Now - lastDelay < TimeSpan.FromMilliseconds(10))
                     delay = TimeSpan.FromMilliseconds(10);
 
@@ -371,6 +380,7 @@ namespace Kanye4King.Interception
 
             Delay.Add(clone);
         }
+
         public async Task ClearDelayQueue(string addr = null, bool sendSaved = false, int delay = 25)
         {
             var copy = Delay.ToList();
@@ -425,6 +435,7 @@ namespace Kanye4King.Interception
                 Task.Run(() => DelayPoll(cts.Token));
             }
         }
+
         public void Unsubscribe(PacketModuleBase module)
         {
             if (!subs.Contains(module))

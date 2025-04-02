@@ -1,8 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Diagnostics;
-
 using Kanye4King.Database;
 using Kanye4King.Models;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +8,6 @@ using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-
 using WindivertDotnet;
 
 namespace Kanye4King.Interception.Modules
@@ -34,6 +31,7 @@ namespace Kanye4King.Interception.Modules
 
             return flag && flag2;
         }
+
         public static bool IsReadonlyPlayerConnection(this IEnumerable<Packet> packets)
         {
             try
@@ -45,10 +43,17 @@ namespace Kanye4King.Interception.Modules
                 return false;
             }
         }
-        public static bool IsOutboundShot(this Packet p) => p.Outbound && p.Length <= 1235 && p.Length >= 1205; //(p.Length == 1211 || p.Length == 1227 || p.Length == 1237);
+
+        public static bool IsOutboundShot(this Packet p) =>
+            p.Outbound && p.Length <= 1235 &&
+            p.Length >= 1205; //(p.Length == 1211 || p.Length == 1227 || p.Length == 1237);
+
         public static bool IsInboundShot(this Packet p) => p.Inbound && p.Length <= 1235 && p.Length >= 1205;
         public static bool IsPveReconnectRequest(this Packet p) => PVE_Reconnect.Contains(p.Length);
-        public static bool IsPveQuestionableReconnectRequest(this Packet p) => p.Outbound && p.Length == PVE_ReconnectRequestLength;
+
+        public static bool IsPveQuestionableReconnectRequest(this Packet p) =>
+            p.Outbound && p.Length == PVE_ReconnectRequestLength;
+
         public static bool IsPveService(this Packet p) => PVE_Service.Contains(p.Length);
 
         public static uint? GetPveId(this Packet packet)
@@ -64,8 +69,10 @@ namespace Kanye4King.Interception.Modules
             {
                 Logger.Error(e);
             }
+
             return null;
         }
+
         public static uint GetPveId(this DbPacket packet)
         {
             try
@@ -79,17 +86,19 @@ namespace Kanye4King.Interception.Modules
             {
                 Logger.Error(e);
             }
+
             return 0;
         }
 
         public static unsafe Packet BuildSameDirection(this Packet p)
         {
-            var id = p.SourceProvider.Connections[p.RemoteAddress].Last(x => x.Inbound == p.Inbound).ParseResult.IPV4Header->Id;
-            
+            var id = p.SourceProvider.Connections[p.RemoteAddress].Last(x => x.Inbound == p.Inbound).ParseResult
+                .IPV4Header->Id;
+
             var ipHeader = new IPV4Header
             {
                 TTL = 128,
-                Version =  IPVersion.V4,
+                Version = IPVersion.V4,
                 DstAddr = p.ParseResult.IPV4Header->DstAddr,
                 SrcAddr = p.ParseResult.IPV4Header->SrcAddr,
                 FragmentFlags = p.ParseResult.IPV4Header->FragmentFlags,
@@ -133,18 +142,21 @@ namespace Kanye4King.Interception.Modules
             }
 
             packet.CalcChecksums(addr);
-            return new Packet(packet, addr, p.SourceProvider.PortRangeStart, p.SourceProvider.PortRangeEnd, p.SourceProvider)
+            return new Packet(packet, addr, p.SourceProvider.PortRangeStart, p.SourceProvider.PortRangeEnd,
+                p.SourceProvider)
             {
                 Inbound = p.Inbound,
                 IsSent = false,
                 IsSaved = false,
             };
         }
+
         public static unsafe Packet Clone(this Packet p)
         {
             var addr = p.Addr.Clone();
             var pack = p.OriginalPacket.Clone();
-            return new Packet(pack, addr, p.SourceProvider.PortRangeStart, p.SourceProvider.PortRangeEnd, p.SourceProvider)
+            return new Packet(pack, addr, p.SourceProvider.PortRangeStart, p.SourceProvider.PortRangeEnd,
+                p.SourceProvider)
             {
                 Inbound = p.Inbound,
                 CreatedAt = p.CreatedAt,
@@ -152,6 +164,7 @@ namespace Kanye4King.Interception.Modules
                 IsSaved = false
             };
         }
+
         public static Packet ClearTcpFlags(this Packet p)
         {
             unsafe
@@ -164,6 +177,7 @@ namespace Kanye4King.Interception.Modules
                 p.ParseResult.TcpHeader->Ack = false;
                 p.ParseResult.TcpHeader->AckNum = 0;
             }
+
             return p;
         }
 
@@ -172,7 +186,7 @@ namespace Kanye4King.Interception.Modules
         {
             var flags = p.Flags;
             var sb = new StringBuilder();
-            if (p.SeqNum.HasValue) 
+            if (p.SeqNum.HasValue)
                 sb.Append($"SEQ {p.SeqNum}.");
             if (flags.HasFlag(TcpFlags.ACK))
                 sb.Append($"ACK {p.AckNum}.");

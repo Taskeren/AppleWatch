@@ -2,7 +2,6 @@
 using Kanye4King.Database;
 using Kanye4King.Interception.Modules;
 using Kanye4King.Utility;
-
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -69,10 +68,6 @@ namespace Kanye4King.Windows
         }
 
 
-
-
-
-
         // Adding content
 
         // ADD ITEMS FROM START IF SCROLL UP
@@ -84,7 +79,7 @@ namespace Kanye4King.Windows
                 AfterDateFilter = MainWindow.Instance.AppStart;
                 AfterDateFilter_TextBox.Text = AfterDateFilter.ToString("dd/MM/yy HH:mm:ss");
             }
-                
+
             DateTime.TryParse(BeforeDateFilter_TextBox.Text, out BeforeDateFilter);
 
             var packet = Packets.Checked;
@@ -102,7 +97,7 @@ namespace Kanye4King.Windows
                 maxlen = int.MaxValue;
 
             var conns = Connections.SelectedItems.OfType<ConnectionModel>().Cast<ConnectionModel>();
-            
+
             var iterations = 30;
             var timeDelta = (finish - start) / 30;
 
@@ -118,7 +113,9 @@ namespace Kanye4King.Windows
                     if (conns.Count() == 0)
                     {
                         packets = db.Packets
-                            .Where(x => x.CreatedAt >= partialStart && x.CreatedAt <= partialFinish && x.Length >= len && x.Length <= maxlen && (x.IsSent || block) && (x.IsInbound && inb || !x.IsInbound && outb))
+                            .Where(x => x.CreatedAt >= partialStart && x.CreatedAt <= partialFinish &&
+                                        x.Length >= len && x.Length <= maxlen && (x.IsSent || block) &&
+                                        (x.IsInbound && inb || !x.IsInbound && outb))
                             .OrderByDescending(x => x.CreatedAt).Select(x => new PacketModel(x) as LogObject).ToList();
                     }
                     else
@@ -127,8 +124,13 @@ namespace Kanye4King.Windows
                         var addrs = targets.Select(x => x.Split(':')[0]).ToList();
                         var ports = targets.Select(x => int.Parse(x.Split(':')[1])).Distinct().ToList();
                         packets = db.Packets
-                            .Where(x => x.CreatedAt >= partialStart && x.CreatedAt <= partialFinish && x.Length >= len && x.Length <= maxlen && (x.IsSent || block) && (x.IsInbound && inb || !x.IsInbound && outb) && (ports.Contains(x.DstPort.Value) || ports.Contains(x.SrcPort.Value)))
-                            .OrderByDescending(x => x.CreatedAt).ToList().Where(x => addrs.Contains(x.DstAddr) || addrs.Contains(x.SrcAddr)).Select(x => new PacketModel(x) as LogObject).ToList();
+                            .Where(x => x.CreatedAt >= partialStart && x.CreatedAt <= partialFinish &&
+                                        x.Length >= len && x.Length <= maxlen && (x.IsSent || block) &&
+                                        (x.IsInbound && inb || !x.IsInbound && outb) &&
+                                        (ports.Contains(x.DstPort.Value) || ports.Contains(x.SrcPort.Value)))
+                            .OrderByDescending(x => x.CreatedAt).ToList()
+                            .Where(x => addrs.Contains(x.DstAddr) || addrs.Contains(x.SrcAddr))
+                            .Select(x => new PacketModel(x) as LogObject).ToList();
                     }
 
                     Logger.Debug($"Loaded {packets.Count} packets");
@@ -154,7 +156,8 @@ namespace Kanye4King.Windows
                             ConnectionsContainer.Clear();
 
                             var packets = LogsContainer.OfType<PacketModel>().Cast<PacketModel>().ToList();
-                            var targets = packets.Where(x => !x.Direction).Select(x => x.Target).Distinct().OrderBy(x => x).ToList();
+                            var targets = packets.Where(x => !x.Direction).Select(x => x.Target).Distinct()
+                                .OrderBy(x => x).ToList();
                             int precision = 40;
                             var iteration = (finish - start) / precision;
 
@@ -183,7 +186,8 @@ namespace Kanye4King.Windows
                                     }
                                 }
 
-                                string info = $"In:{download.Sum().BytesLenghtToString()} Out:{upload.Sum().BytesLenghtToString()}";
+                                string info =
+                                    $"In:{download.Sum().BytesLenghtToString()} Out:{upload.Sum().BytesLenghtToString()}";
                                 // TODO: add player tags (not sure tho)
 
                                 //var plot = new PlotModel();
@@ -206,10 +210,6 @@ namespace Kanye4King.Windows
             LogsContainer.Clear();
             Dispatcher.BeginInvoke(() => loadPart());
         }
-
-
-
-
 
 
         private void ExitButtonClick(object sender, RoutedEventArgs e)
@@ -241,21 +241,15 @@ namespace Kanye4King.Windows
 
         private void InboundFilter_CheckboxChecked(object sender, RoutedEventArgs e)
         {
-
         }
 
         private void OutboundFilter_CheckboxChecked(object sender, RoutedEventArgs e)
         {
-
         }
 
         private void ConnectionsSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
         }
-
-
-
-
 
 
         public class ConnectionModel
@@ -271,7 +265,10 @@ namespace Kanye4King.Windows
 
         public class LogModel : LogObject
         {
-            public LogModel() {}
+            public LogModel()
+            {
+            }
+
             public LogModel(DbLog log)
             {
                 Date = log.CreatedAt;
@@ -279,9 +276,11 @@ namespace Kanye4King.Windows
                 Type = log.Type;
                 Id = log.Id;
             }
+
             public string Text { get; set; }
             public LogLevel Type { get; set; }
             public ulong Id { get; set; }
+
             public Brush TypeForeground
             {
                 get
@@ -297,6 +296,7 @@ namespace Kanye4King.Windows
                     };
                 }
             }
+
             public Brush TextForeground
             {
                 get
@@ -312,9 +312,13 @@ namespace Kanye4King.Windows
                 }
             }
         }
+
         public class PacketModel : LogObject
         {
-            public PacketModel() {}
+            public PacketModel()
+            {
+            }
+
             public PacketModel(DbPacket packet)
             {
                 Date = packet.CreatedAt;
@@ -337,12 +341,13 @@ namespace Kanye4King.Windows
                     PveId = packet.Flags;
                 }
             }
+
             public byte[] Bytes { get; set; }
             public int Length { get; set; }
 
             public string Source { get; set; }
             public string Target { get; set; }
-            public string RemoteAddr =>  Direction ? Source : Target;
+            public string RemoteAddr => Direction ? Source : Target;
 
             public bool Direction { get; set; }
             public bool Type { get; set; }
@@ -350,8 +355,14 @@ namespace Kanye4King.Windows
             public Visibility PvePacket { get; set; } = Visibility.Collapsed;
             public string PveId { get; set; } = "0";
 
-            public Brush TypeForeground => Type ? new SolidColorBrush(Color.FromArgb(0xff, 0xA9, 0xEC, 0x6B)) : new SolidColorBrush(Color.FromArgb(0xff, 0xDA, 0x29, 0x48));
-            public Brush DirForeground => Direction ? new SolidColorBrush(Color.FromArgb(0xff, 0xE7, 0xFB, 0xBE)) : new SolidColorBrush(Color.FromArgb(0xff, 0xDE, 0xBA, 0xCE));
+            public Brush TypeForeground =>
+                Type
+                    ? new SolidColorBrush(Color.FromArgb(0xff, 0xA9, 0xEC, 0x6B))
+                    : new SolidColorBrush(Color.FromArgb(0xff, 0xDA, 0x29, 0x48));
+
+            public Brush DirForeground => Direction
+                ? new SolidColorBrush(Color.FromArgb(0xff, 0xE7, 0xFB, 0xBE))
+                : new SolidColorBrush(Color.FromArgb(0xff, 0xDE, 0xBA, 0xCE));
         }
     }
 }

@@ -1,8 +1,6 @@
 ﻿using Hardcodet.Wpf.TaskbarNotification;
-
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualBasic.Logging;
-
 using Kanye4King.Controls;
 using Kanye4King.Database;
 using Kanye4King.Interception;
@@ -10,7 +8,6 @@ using Kanye4King.Interception.Modules;
 using Kanye4King.Models;
 using Kanye4King.Utility;
 using Kanye4King.Windows;
-
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -34,9 +31,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
-
 using WindivertDotnet;
-
 using Application = System.Windows.Application;
 
 namespace Kanye4King
@@ -47,12 +42,12 @@ namespace Kanye4King
         public IdentityChecker Checker { get; private set; }
         public DateTime AppStart = DateTime.Now;
         TimeSpan animationTime = TimeSpan.FromSeconds(0.5);
-        
-        public ObservableCollection<EnabledModuleTimer> DisplayModules { get; set; } = new ObservableCollection<EnabledModuleTimer>();
+
+        public ObservableCollection<EnabledModuleTimer> DisplayModules { get; set; } =
+            new ObservableCollection<EnabledModuleTimer>();
+
         KeyListener inputListener { get; set; }
 
-
-        
 
         public string CurrentModuleName => Config.Instance.CurrentModule;
         private PacketModuleBase CurrentModule => InterceptionManager.GetModule(CurrentModuleName);
@@ -61,7 +56,8 @@ namespace Kanye4King
 
         public OverlayWindow overlay { get; set; }
 
-        public void KeyLogger(LinkedList<Keycode> keycodes) => Logger.Key(String.Join(" + ", keycodes.Select(x => x.ToString().Replace("VK_", ""))));
+        public void KeyLogger(LinkedList<Keycode> keycodes) =>
+            Logger.Key(String.Join(" + ", keycodes.Select(x => x.ToString().Replace("VK_", ""))));
 
         protected override void OnClosed(EventArgs e)
         {
@@ -100,8 +96,8 @@ namespace Kanye4King
                 StartupProgressBar.Instance.Close();
 
                 float getBrightness(System.Drawing.Color c)
-                { 
-                    return (c.R * 0.299f + c.G * 0.587f + c.B * 0.114f) / 256f; 
+                {
+                    return (c.R * 0.299f + c.G * 0.587f + c.B * 0.114f) / 256f;
                 }
 
                 CurrentTime.Content = DateTime.Now.ToString("hh:mm:ss");
@@ -118,11 +114,12 @@ namespace Kanye4King
                     Overlay.Border_MouseEnter(this, null);
                     Overlay.Border_MouseLeave(this, null);
                 }
-                    
+
 
                 var accent = System.Windows.Application.Current.Resources["AccentColor"] as SolidColorBrush;
 
-                System.Drawing.Color color = System.Drawing.Color.FromArgb(accent.Color.R, accent.Color.G, accent.Color.B);
+                System.Drawing.Color color =
+                    System.Drawing.Color.FromArgb(accent.Color.R, accent.Color.G, accent.Color.B);
                 float hue = color.GetHue();
                 float saturation = color.GetSaturation();
                 float lightness = getBrightness(color) - 0.425f;
@@ -167,7 +164,7 @@ namespace Kanye4King
                 var l = new DispatcherTimer();
                 l.Tick += (s, a) => Task.Run(async () =>
                 {
-                 //   Checker.AuthApp.check();
+                    //   Checker.AuthApp.check();
                     var a = Checker.Calc;
                 });
                 l.Interval = TimeSpan.FromSeconds(120);
@@ -177,7 +174,8 @@ namespace Kanye4King
 
         private void AltTabTracker(LinkedList<Keycode> keycodes)
         {
-            if (keycodes.Contains(Keycode.VK_LWIN) || (keycodes.Contains(Keycode.VK_LALT) && keycodes.Contains(Keycode.VK_TAB)))
+            if (keycodes.Contains(Keycode.VK_LWIN) ||
+                (keycodes.Contains(Keycode.VK_LALT) && keycodes.Contains(Keycode.VK_TAB)))
             {
                 OverlayWindow.CheckGameFocus(true);
             }
@@ -196,9 +194,9 @@ namespace Kanye4King
                     foreach (var ahk in Config.Instance.LastOpenAhks)
                         AhkManager.TryStopAhk(ahk);
                 }
-             //   Checker.AuthApp.logout();
+                //   Checker.AuthApp.logout();
             }
-            catch 
+            catch
             {
             }
         }
@@ -215,6 +213,7 @@ namespace Kanye4King
                 Logger.Debug($"Task cancelled");
                 return;
             }
+
             Logger.Debug($"{e.Exception.GetType().Name}: {e.Exception.StackTrace}");
         }
 
@@ -224,23 +223,26 @@ namespace Kanye4King
             try
             {
                 var modules = InterceptionManager.Modules.Where(x => x.Togglable);
-                var pairs = modules.Select(x => (module: x, display: DisplayModules.FirstOrDefault(y => y.ModuleName == x.Name))).ToArray();
+                var pairs = modules.Select(x =>
+                    (module: x, display: DisplayModules.FirstOrDefault(y => y.ModuleName == x.Name))).ToArray();
 
                 foreach (var p in pairs)
                 {
                     var display = p.display;
                     if (p.module.IsActivated && display is null)
-                    {   // New active found
+                    {
+                        // New active found
                         var d = new EnabledModuleTimer(p.module.Name) { Visibility = Visibility.Collapsed };
                         DisplayModules.Add(d);
-                        Dispatcher.BeginInvoke(() => d.ElementAppear()); 
+                        Dispatcher.BeginInvoke(() => d.ElementAppear());
                     }
 
                     if (display is not null)
                     {
                         display.UpdateTimer();
 
-                        if (!p.module.IsActivated && DateTime.Now - p.module.StartTime > TimeSpan.FromSeconds(Config.Instance.Settings.Window_TimerDecaySeconds))
+                        if (!p.module.IsActivated && DateTime.Now - p.module.StartTime >
+                            TimeSpan.FromSeconds(Config.Instance.Settings.Window_TimerDecaySeconds))
                         {
                             Dispatcher.BeginInvoke(async () =>
                             {
@@ -321,7 +323,6 @@ namespace Kanye4King
             }
 
 
-
             if (CurrentModule is PvpModule)
             {
                 PvpInCB.SetState(PvpModule.Inbound);
@@ -343,19 +344,18 @@ namespace Kanye4King
             }
 
 
-
             // мега костыль, как и вся функция в принципе, переделать бы через страницы
             if (CurrentModule is PvpModule)
             {
                 kbd.Content = "DL";
                 ActivationGrid.ToolTip = "Block info sent by players";
             }
+
             if (CurrentModule is PveModule)
             {
                 kbd.Content = "DL";
                 ActivationGrid.ToolTip = "Block info sent by server";
             }
-
 
 
             if (CurrentModule is MultishotModule ms)
@@ -377,7 +377,6 @@ namespace Kanye4King
             {
                 MULTISHOT_Panel.Visibility = Visibility.Collapsed;
             }
-
 
 
             if (CurrentModule is ApiModule)
@@ -404,9 +403,10 @@ namespace Kanye4King
 
 
         // Keybind logic
-        private Dictionary<Controls.Button, List<Keycode>> listening = new ();
+        private Dictionary<Controls.Button, List<Keycode>> listening = new();
         private DateTime lastUpdated = DateTime.MinValue;
         private SemaphoreSlim keybindSemaphore = new(1);
+
         private void KeybindButtonClick(object sender, RoutedEventArgs e)
         {
             if (DateTime.Now - lastUpdated > TimeSpan.FromSeconds(0.15) && keybindSemaphore.CurrentCount > 0)
@@ -429,13 +429,14 @@ namespace Kanye4King
                         listening.Add(button, PvpModule.OutboundKeybind);
                     else if (button == PveSlowOutbound)
                         listening.Add(button, PveModule.SlowOutboundKeybind);
-                    
+
                     //button.Background = new SolidColorBrush(Color.FromArgb(0x88, 0xD9, 0xCC, 0xD9));
                     if (listening.Count == 1)
                     {
                         InterceptionManager.Modules.ForEach(x => x.UnhookKeybind());
                         KeyListener.KeysPressed += ListeningNewKeybind;
                     }
+
                     button.ButtonBorder.BorderThickness = new Thickness(1.75);
                     button.ButtonBorder.BorderBrush = Brushes.White;
                     button.ButtonBorder.Effect = new DropShadowEffect()
@@ -454,6 +455,7 @@ namespace Kanye4King
                         InterceptionManager.Modules.ForEach(x => x.HookKeybind());
                         KeyListener.KeysPressed -= ListeningNewKeybind;
                     }
+
                     button.ButtonBorder.BorderThickness = new Thickness(0);
                     button.ButtonBorder.BorderBrush = Brushes.Transparent;
                     button.ButtonBorder.Effect = null;
@@ -493,7 +495,9 @@ namespace Kanye4King
                         foreach (var b in listening)
                             b.Key.Text = String.Join(" + ", b.Value.Select(x => x.ToString().Replace("VK_", "")));
                     }
-                    catch {}
+                    catch
+                    {
+                    }
                 });
             }
         }

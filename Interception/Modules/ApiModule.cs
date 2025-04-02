@@ -1,8 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.ValueGeneration.Internal;
-
 using Kanye4King.Interception.PacketProviders;
 using Kanye4King.Models;
-
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -69,6 +67,7 @@ namespace Kanye4King.Interception.Modules
 
                         await Task.Delay(1000, cts.Token);
                     }
+
                     cts.Dispose();
                 });
             }
@@ -98,11 +97,11 @@ namespace Kanye4King.Interception.Modules
                                 p.SourceProvider.StorePacket(p);
                                 if (Buffer) await p.SourceProvider.SendPacket(p, true);
 
-                                Logger.Debug($"{Name}: Seq dist {TcpReordering.Cache[addr].Location[FlagType.Remote].HighSeq - p.SeqNum}");
+                                Logger.Debug(
+                                    $"{Name}: Seq dist {TcpReordering.Cache[addr].Location[FlagType.Remote].HighSeq - p.SeqNum}");
                             }
 
                             Logger.Debug($"{Name}: Sent {send.Length} on {addr}");
-
                         }
                         catch (Exception e)
                         {
@@ -117,6 +116,7 @@ namespace Kanye4King.Interception.Modules
         DateTime latest;
         DateTime reachedCapacity;
         CancellationTokenSource cts;
+
         public override bool AllowPacket(Packet p)
         {
             if (!base.AllowPacket(p)) return false;
@@ -147,13 +147,15 @@ namespace Kanye4King.Interception.Modules
                     return false;
                 }
 
-                if (captured && TcpReordering.Cache[p.RemoteAddress].Location[FlagType.Remote].Blocked.Any(x => x.SeqNum == p.SeqNum))
+                if (captured && TcpReordering.Cache[p.RemoteAddress].Location[FlagType.Remote].Blocked
+                        .Any(x => x.SeqNum == p.SeqNum))
                 {
                     latest = p.CreatedAt;
 
                     if (reachedCapacity == DateTime.MaxValue)
                     {
-                        var min = TcpReordering.Cache[p.RemoteAddress].Location[FlagType.Remote].Blocked.Min(x => x.SeqNum);
+                        var min = TcpReordering.Cache[p.RemoteAddress].Location[FlagType.Remote].Blocked
+                            .Min(x => x.SeqNum);
                         var limit = min + 1460;
 
                         if (p.SeqNum + p.Length == limit)

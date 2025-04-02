@@ -15,7 +15,7 @@ namespace Kanye4King.Interception.Modules
         {
             Icon = System.Windows.Application.Current.FindResource("PauseIcon") as Geometry;
             Description =
-@"Uses windows api
+                @"Uses windows api
 Pauses game process";
         }
 
@@ -94,10 +94,13 @@ Pauses game process";
 
         [DllImport("kernel32.dll")]
         static extern IntPtr OpenThread(ThreadAccess dwDesiredAccess, bool bInheritHandle, uint dwThreadId);
+
         [DllImport("kernel32.dll")]
         static extern uint SuspendThread(IntPtr hThread);
+
         [DllImport("kernel32.dll")]
         static extern int ResumeThread(IntPtr hThread);
+
         [DllImport("kernel32", CharSet = CharSet.Auto, SetLastError = true)]
         static extern bool CloseHandle(IntPtr handle);
     }

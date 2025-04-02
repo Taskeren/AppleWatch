@@ -1,6 +1,5 @@
 ﻿using Kanye4King.Models;
 using Kanye4King.Utility;
-
 using System;
 using System.ServiceProcess;
 using System.Collections.Generic;
@@ -23,22 +22,27 @@ namespace Kanye4King
     public class IdentityChecker
     {
         string last = string.Empty;
+
         public string Calc => Calcc();
+
 //        public Auth AuthApp { get; private set; }
         public string Name { get; set; } = "null";
         public AccessType Type { get; set; }
-        public TimeSpan TimeLeft => TimeSpan.FromDays(9999) /*AuthApp.user_data.subscriptions.Max(x => x.licenceTimer) */;
+
+        public TimeSpan TimeLeft =>
+            TimeSpan.FromDays(9999) /*AuthApp.user_data.subscriptions.Max(x => x.licenceTimer) */;
+
         RuntimeData data;
 
         public IdentityChecker()
         {
-           /* AuthApp = new Auth(
-                name: "sw",
-                ownerid: "0aqx0WKPed",
-                secret: "6874394dee7ff1b785b8f612f58369069b7b7f837104262e2d9e48c4d4053a9c",
-                hwid: BuildHwid()
-            );
-            AuthApp.init(); */
+            /* AuthApp = new Auth(
+                 name: "sw",
+                 ownerid: "0aqx0WKPed",
+                 secret: "6874394dee7ff1b785b8f612f58369069b7b7f837104262e2d9e48c4d4053a9c",
+                 hwid: BuildHwid()
+             );
+             AuthApp.init(); */
             data = new RuntimeData();
         }
 
@@ -90,6 +94,7 @@ namespace Kanye4King
                 CLOSE_PROTECTED = 128,
                 ANTI_ATTACH = 256,
             }
+
             [Flags]
             public enum MiscTags
             {
@@ -137,14 +142,19 @@ namespace Kanye4King
                     {
                         try
                         {
-                            var nums = new int[] { int.Parse(match.Groups[1].Value), int.Parse(match.Groups[2].Value), int.Parse(match.Groups[3].Value), int.Parse(match.Groups[4].Value) };
+                            var nums = new int[]
+                            {
+                                int.Parse(match.Groups[1].Value), int.Parse(match.Groups[2].Value),
+                                int.Parse(match.Groups[3].Value), int.Parse(match.Groups[4].Value)
+                            };
                             if (nums[0] == 127 && nums[1] == 0 && nums[2] == 0 && nums[3] == 1)
                             {
                                 P = P.Replace(match.Value, "local");
                             }
                         }
                         catch
-                        { }
+                        {
+                        }
                     }
                 }
 
@@ -177,15 +187,19 @@ namespace Kanye4King
             {
                 try
                 {
-                    RegistryKey registry = Registry.CurrentUser.OpenSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings", true);
+                    RegistryKey registry =
+                        Registry.CurrentUser.OpenSubKey(
+                            "Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings", true);
                     var enabled = registry.GetValue("ProxyEnable");
                     var http = registry.GetValue("ProxyHttp1.1");
-                    if ((enabled is not null && enabled.ToString() == "1") || (http is not null && http.ToString() == "1"))
+                    if ((enabled is not null && enabled.ToString() == "1") ||
+                        (http is not null && http.ToString() == "1"))
                     {
                         var server = registry.GetValue("ProxyServer");
                         P = server is not null ? server.ToString() : "x";
                         return;
                     }
+
                     P = null;
                 }
                 catch (Exception ex)
@@ -195,12 +209,13 @@ namespace Kanye4King
                     return;
                 }
             }
+
             void CheckProcessesAndWindows()
             {
                 string[] bad =
                 {
                     "x32dbg", "x64dbg", "windbg", "ollydbg", "dnspy", "immunity debugger",
-                    "hyperdbg", "debug", "debugger", "cheat engine", "cheatengine", "ida" ,
+                    "hyperdbg", "debug", "debugger", "cheat engine", "cheatengine", "ida",
                     "procmon64", "codecracker", "x96dbg", "de4dot", "ilspy", "sharpod", "megadumper",
                     "hxd", "phantOm", "ghidra"
                 };
@@ -229,17 +244,20 @@ namespace Kanye4King
                 //    messages.Add("f:" + e.GetType().Name);
                 //}
 
-                try 
+                try
                 {
                     var procs = Process.GetProcesses();
                     foreach (var p in procs)
                     {
                         if (proc_whitelist.Contains(p.ProcessName)) continue;
 
-                        var search = bad.FirstOrDefault(x => p.MainWindowTitle.Contains(x, StringComparison.OrdinalIgnoreCase) || p.ProcessName.Contains(x, StringComparison.OrdinalIgnoreCase));
+                        var search = bad.FirstOrDefault(x =>
+                            p.MainWindowTitle.Contains(x, StringComparison.OrdinalIgnoreCase) ||
+                            p.ProcessName.Contains(x, StringComparison.OrdinalIgnoreCase));
                         if (search is not null)
                         {
-                            var titleWords = p.MainWindowTitle.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                            var titleWords =
+                                p.MainWindowTitle.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                             var shortenedTitle = string.Join(" ", titleWords.Take(2));
                             messages.Add($"proc:{search}:{shortenedTitle}|{p.ProcessName}");
                         }
@@ -258,7 +276,8 @@ namespace Kanye4King
                 {
                     Structs.PROCESS_BASIC_INFORMATION PBI = new Structs.PROCESS_BASIC_INFORMATION();
                     uint ProcessBasicInformation = 0;
-                    if (NtQueryInformationProcess(Process.GetCurrentProcess().SafeHandle, ProcessBasicInformation, ref PBI, (uint)Marshal.SizeOf(typeof(Structs.PROCESS_BASIC_INFORMATION)), 0) == 0)
+                    if (NtQueryInformationProcess(Process.GetCurrentProcess().SafeHandle, ProcessBasicInformation,
+                            ref PBI, (uint)Marshal.SizeOf(typeof(Structs.PROCESS_BASIC_INFORMATION)), 0) == 0)
                     {
                         int ParentPID = PBI.InheritedFromUniqueProcessId.ToInt32();
                         if (ParentPID != 0)
@@ -266,11 +285,12 @@ namespace Kanye4King
                             byte[] FileNameBuffer = new byte[256];
                             Int32[] Size = new Int32[256];
                             Size[0] = 256;
-                            QueryFullProcessImageNameA(Process.GetProcessById(ParentPID).SafeHandle, 0, FileNameBuffer, Size);
+                            QueryFullProcessImageNameA(Process.GetProcessById(ParentPID).SafeHandle, 0, FileNameBuffer,
+                                Size);
                             string ParentFilePath = CleanPath(Encoding.UTF8.GetString(FileNameBuffer));
                             string ParentFileName = Path.GetFileName(ParentFilePath);
                             string[] Whitelisted = { "explorer.exe", "cmd.exe", "RuntimeBroker.exe", "patcher.exe" };
-                            
+
                             if (!Whitelisted.Any(x => ParentFileName.Equals(x)))
                                 messages.Add($"par:{ParentFileName}");
                         }
@@ -283,6 +303,7 @@ namespace Kanye4King
 
                 S = !messages.Any() ? null : string.Join("..", messages);
             }
+
             void CheckDebug()
             {
                 bool AntiDebugAttach()
@@ -292,8 +313,10 @@ namespace Kanye4King
                     IntPtr DbgBreakPointAddress = GetProcAddress(NtdllModule, "DbgBreakPoint");
                     byte[] Int3InvaildCode = { 0xCC };
                     byte[] RetCode = { 0xC3 };
-                    bool Status = WriteProcessMemory(Process.GetCurrentProcess().SafeHandle, DbgUiRemoteBreakinAddress, Int3InvaildCode, 1, 0);
-                    bool Status2 = WriteProcessMemory(Process.GetCurrentProcess().SafeHandle, DbgBreakPointAddress, RetCode, 1, 0);
+                    bool Status = WriteProcessMemory(Process.GetCurrentProcess().SafeHandle, DbgUiRemoteBreakinAddress,
+                        Int3InvaildCode, 1, 0);
+                    bool Status2 = WriteProcessMemory(Process.GetCurrentProcess().SafeHandle, DbgBreakPointAddress,
+                        RetCode, 1, 0);
                     return Status && Status2;
                 }
 
@@ -311,14 +334,16 @@ namespace Kanye4King
                     else D &= ~DebugTags.API;
 
                     uint processDebugFlags = 0;
-                    NtQueryInformationProcess(Process.GetCurrentProcess().SafeHandle, 0x1F, out processDebugFlags, sizeof(uint), 0);
+                    NtQueryInformationProcess(Process.GetCurrentProcess().SafeHandle, 0x1F, out processDebugFlags,
+                        sizeof(uint), 0);
                     if (processDebugFlags == 0) D |= DebugTags.NT_FLAGS;
                     else D &= ~DebugTags.NT_FLAGS;
 
                     uint debuggerPortPresent = 0;
                     uint size = sizeof(uint);
                     if (Environment.Is64BitProcess) size = sizeof(uint) * 2;
-                    NtQueryInformationProcess(Process.GetCurrentProcess().SafeHandle, 7, out debuggerPortPresent, size, 0);
+                    NtQueryInformationProcess(Process.GetCurrentProcess().SafeHandle, 7, out debuggerPortPresent, size,
+                        0);
                     if (debuggerPortPresent != 0) D |= DebugTags.NT_PORT;
                     else D &= ~DebugTags.NT_PORT;
 
@@ -361,22 +386,23 @@ namespace Kanye4King
                     D |= DebugTags.FAILED;
                     Logger.Error(e);
                 }
-                
             }
+
             void CheckMisc()
             {
-                
                 bool HardwareRegistersBreakpointsDetection()
                 {
                     Structs.CONTEXT Context = new Structs.CONTEXT();
                     Context.ContextFlags = CONTEXT_DEBUG_REGISTERS;
                     if (GetThreadContext(GetCurrentThread(), ref Context))
                     {
-                        if ((Context.Dr1 != 0x00 || Context.Dr2 != 0x00 || Context.Dr3 != 0x00 || Context.Dr4 != 0x00 || Context.Dr5 != 0x00 || Context.Dr6 != 0x00 || Context.Dr7 != 0x00))
+                        if ((Context.Dr1 != 0x00 || Context.Dr2 != 0x00 || Context.Dr3 != 0x00 || Context.Dr4 != 0x00 ||
+                             Context.Dr5 != 0x00 || Context.Dr6 != 0x00 || Context.Dr7 != 0x00))
                         {
                             return true;
                         }
                     }
+
                     return false;
                 }
 
@@ -397,6 +423,7 @@ namespace Kanye4King
                                     AnyThreadFailed = true;
                             }
                         }
+
                         if (!AnyThreadFailed)
                             return true;
                         return false;
@@ -409,50 +436,64 @@ namespace Kanye4King
 
                 bool IsUnsignedDriversAllowed()
                 {
-                    Structs.SYSTEM_CODEINTEGRITY_INFORMATION CodeIntegrityInfo = new Structs.SYSTEM_CODEINTEGRITY_INFORMATION();
+                    Structs.SYSTEM_CODEINTEGRITY_INFORMATION CodeIntegrityInfo =
+                        new Structs.SYSTEM_CODEINTEGRITY_INFORMATION();
                     CodeIntegrityInfo.Length = (uint)Marshal.SizeOf(typeof(Structs.SYSTEM_CODEINTEGRITY_INFORMATION));
                     uint ReturnLength = 0;
-                    if (NtQuerySystemInformation(SystemCodeIntegrityInformation, ref CodeIntegrityInfo, (uint)Marshal.SizeOf(CodeIntegrityInfo), out ReturnLength) >= 0 && ReturnLength == (uint)Marshal.SizeOf(CodeIntegrityInfo))
+                    if (NtQuerySystemInformation(SystemCodeIntegrityInformation, ref CodeIntegrityInfo,
+                            (uint)Marshal.SizeOf(CodeIntegrityInfo), out ReturnLength) >= 0 &&
+                        ReturnLength == (uint)Marshal.SizeOf(CodeIntegrityInfo))
                     {
                         uint CODEINTEGRITY_OPTION_ENABLED = 0x01;
-                        if ((CodeIntegrityInfo.CodeIntegrityOptions & CODEINTEGRITY_OPTION_ENABLED) == CODEINTEGRITY_OPTION_ENABLED)
+                        if ((CodeIntegrityInfo.CodeIntegrityOptions & CODEINTEGRITY_OPTION_ENABLED) ==
+                            CODEINTEGRITY_OPTION_ENABLED)
                         {
                             return false;
                         }
                     }
+
                     return true;
                 }
 
                 bool IsTestSignedDriversAllowed()
                 {
-                    Structs.SYSTEM_CODEINTEGRITY_INFORMATION CodeIntegrityInfo = new Structs.SYSTEM_CODEINTEGRITY_INFORMATION();
+                    Structs.SYSTEM_CODEINTEGRITY_INFORMATION CodeIntegrityInfo =
+                        new Structs.SYSTEM_CODEINTEGRITY_INFORMATION();
                     CodeIntegrityInfo.Length = (uint)Marshal.SizeOf(typeof(Structs.SYSTEM_CODEINTEGRITY_INFORMATION));
                     uint ReturnLength = 0;
-                    if (NtQuerySystemInformation(SystemCodeIntegrityInformation, ref CodeIntegrityInfo, (uint)Marshal.SizeOf(CodeIntegrityInfo), out ReturnLength) >= 0 && ReturnLength == (uint)Marshal.SizeOf(CodeIntegrityInfo))
+                    if (NtQuerySystemInformation(SystemCodeIntegrityInformation, ref CodeIntegrityInfo,
+                            (uint)Marshal.SizeOf(CodeIntegrityInfo), out ReturnLength) >= 0 &&
+                        ReturnLength == (uint)Marshal.SizeOf(CodeIntegrityInfo))
                     {
                         uint CODEINTEGRITY_OPTION_TESTSIGN = 0x02;
-                        if ((CodeIntegrityInfo.CodeIntegrityOptions & CODEINTEGRITY_OPTION_TESTSIGN) == CODEINTEGRITY_OPTION_TESTSIGN)
+                        if ((CodeIntegrityInfo.CodeIntegrityOptions & CODEINTEGRITY_OPTION_TESTSIGN) ==
+                            CODEINTEGRITY_OPTION_TESTSIGN)
                         {
                             return true;
                         }
                     }
+
                     return false;
                 }
 
                 bool IsKernelDebuggingEnabled()
                 {
                     uint SystemKernelDebuggerInformation = 0x23;
-                    Structs.SYSTEM_KERNEL_DEBUGGER_INFORMATION KernelDebugInfo = new Structs.SYSTEM_KERNEL_DEBUGGER_INFORMATION();
+                    Structs.SYSTEM_KERNEL_DEBUGGER_INFORMATION KernelDebugInfo =
+                        new Structs.SYSTEM_KERNEL_DEBUGGER_INFORMATION();
                     KernelDebugInfo.KernelDebuggerEnabled = false;
                     KernelDebugInfo.KernelDebuggerNotPresent = true;
                     uint ReturnLength = 0;
-                    if (NtQuerySystemInformation(SystemKernelDebuggerInformation, ref KernelDebugInfo, (uint)Marshal.SizeOf(KernelDebugInfo), out ReturnLength) >= 0 && ReturnLength == (uint)Marshal.SizeOf(KernelDebugInfo))
+                    if (NtQuerySystemInformation(SystemKernelDebuggerInformation, ref KernelDebugInfo,
+                            (uint)Marshal.SizeOf(KernelDebugInfo), out ReturnLength) >= 0 &&
+                        ReturnLength == (uint)Marshal.SizeOf(KernelDebugInfo))
                     {
                         if (KernelDebugInfo.KernelDebuggerEnabled || !KernelDebugInfo.KernelDebuggerNotPresent)
                         {
                             return true;
                         }
                     }
+
                     return false;
                 }
 
@@ -465,7 +506,8 @@ namespace Kanye4King
 
                 bool IsComodoSandboxPresent()
                 {
-                    if (GetModuleHandle("cmdvrt32.dll").ToInt32() != 0 || GetModuleHandle("cmdvrt64.dll").ToInt32() != 0)
+                    if (GetModuleHandle("cmdvrt32.dll").ToInt32() != 0 ||
+                        GetModuleHandle("cmdvrt64.dll").ToInt32() != 0)
                         return true;
                     return false;
                 }
@@ -493,6 +535,7 @@ namespace Kanye4King
                     {
                         return true;
                     }
+
                     return false;
                 }
 
@@ -527,10 +570,23 @@ namespace Kanye4King
                     }
 
                     string[] Libraries = { "kernel32.dll", "kernelbase.dll", "ntdll.dll", "user32.dll", "win32u.dll" };
-                    string[] KernelLibAntiDebugFunctions = { "IsDebuggerPresent", "CheckRemoteDebuggerPresent", "GetThreadContext", "CloseHandle", "OutputDebugStringA", "GetTickCount", "SetHandleInformation" };
-                    string[] NtdllAntiDebugFunctions = { "NtQueryInformationProcess", "NtSetInformationThread", "NtClose", "NtGetContextThread", "NtQuerySystemInformation" };
-                    string[] User32AntiDebugFunctions = { "FindWindowW", "FindWindowA", "FindWindowExW", "FindWindowExA", "GetForegroundWindow", "GetWindowTextLengthA", "GetWindowTextA", "BlockInput" };
-                    string[] Win32uAntiDebugFunctions = { "NtUserBlockInput", "NtUserFindWindowEx", "NtUserQueryWindow", "NtUserGetForegroundWindow" };
+                    string[] KernelLibAntiDebugFunctions =
+                    {
+                        "IsDebuggerPresent", "CheckRemoteDebuggerPresent", "GetThreadContext", "CloseHandle",
+                        "OutputDebugStringA", "GetTickCount", "SetHandleInformation"
+                    };
+                    string[] NtdllAntiDebugFunctions =
+                    {
+                        "NtQueryInformationProcess", "NtSetInformationThread", "NtClose", "NtGetContextThread",
+                        "NtQuerySystemInformation"
+                    };
+                    string[] User32AntiDebugFunctions =
+                    {
+                        "FindWindowW", "FindWindowA", "FindWindowExW", "FindWindowExA", "GetForegroundWindow",
+                        "GetWindowTextLengthA", "GetWindowTextA", "BlockInput"
+                    };
+                    string[] Win32uAntiDebugFunctions =
+                        { "NtUserBlockInput", "NtUserFindWindowEx", "NtUserQueryWindow", "NtUserGetForegroundWindow" };
                     foreach (string Library in Libraries)
                     {
                         IntPtr hModule = LowLevelGetModuleHandle(Library);
@@ -539,126 +595,135 @@ namespace Kanye4King
                             switch (Library)
                             {
                                 case "kernel32.dll":
+                                {
+                                    try
                                     {
-                                        try
+                                        foreach (string AntiDebugFunction in KernelLibAntiDebugFunctions)
                                         {
-                                            foreach (string AntiDebugFunction in KernelLibAntiDebugFunctions)
+                                            IntPtr Function = LowLevelGetProcAddress(hModule, AntiDebugFunction);
+                                            byte[] FunctionBytes = new byte[1];
+                                            Marshal.Copy(Function, FunctionBytes, 0, 1);
+                                            if (FunctionBytes[0] == 0x90 || FunctionBytes[0] == 0xE9)
                                             {
-                                                IntPtr Function = LowLevelGetProcAddress(hModule, AntiDebugFunction);
-                                                byte[] FunctionBytes = new byte[1];
-                                                Marshal.Copy(Function, FunctionBytes, 0, 1);
-                                                if (FunctionBytes[0] == 0x90 || FunctionBytes[0] == 0xE9)
-                                                {
-                                                    return true;
-                                                }
+                                                return true;
                                             }
                                         }
-                                        catch
-                                        {
-                                            continue;
-                                        }
                                     }
+                                    catch
+                                    {
+                                        continue;
+                                    }
+                                }
                                     break;
                                 case "kernelbase.dll":
+                                {
+                                    try
                                     {
-                                        try
+                                        foreach (string AntiDebugFunction in KernelLibAntiDebugFunctions)
                                         {
-                                            foreach (string AntiDebugFunction in KernelLibAntiDebugFunctions)
+                                            IntPtr Function = LowLevelGetProcAddress(hModule, AntiDebugFunction);
+                                            byte[] FunctionBytes = new byte[1];
+                                            Marshal.Copy(Function, FunctionBytes, 0, 1);
+                                            if (FunctionBytes[0] == 255 || FunctionBytes[0] == 0x90 ||
+                                                FunctionBytes[0] == 0xE9)
                                             {
-                                                IntPtr Function = LowLevelGetProcAddress(hModule, AntiDebugFunction);
-                                                byte[] FunctionBytes = new byte[1];
-                                                Marshal.Copy(Function, FunctionBytes, 0, 1);
-                                                if (FunctionBytes[0] == 255 || FunctionBytes[0] == 0x90 || FunctionBytes[0] == 0xE9)
-                                                {
-                                                    return true;
-                                                }
+                                                return true;
                                             }
                                         }
-                                        catch
-                                        {
-                                            continue;
-                                        }
                                     }
+                                    catch
+                                    {
+                                        continue;
+                                    }
+                                }
                                     break;
                                 case "ntdll.dll":
+                                {
+                                    try
                                     {
-                                        try
+                                        foreach (string AntiDebugFunction in NtdllAntiDebugFunctions)
                                         {
-                                            foreach (string AntiDebugFunction in NtdllAntiDebugFunctions)
+                                            IntPtr Function = LowLevelGetProcAddress(hModule, AntiDebugFunction);
+                                            byte[] FunctionBytes = new byte[1];
+                                            Marshal.Copy(Function, FunctionBytes, 0, 1);
+                                            if (FunctionBytes[0] == 255 || FunctionBytes[0] == 0x90 ||
+                                                FunctionBytes[0] == 0xE9)
                                             {
-                                                IntPtr Function = LowLevelGetProcAddress(hModule, AntiDebugFunction);
-                                                byte[] FunctionBytes = new byte[1];
-                                                Marshal.Copy(Function, FunctionBytes, 0, 1);
-                                                if (FunctionBytes[0] == 255 || FunctionBytes[0] == 0x90 || FunctionBytes[0] == 0xE9)
-                                                {
-                                                    return true;
-                                                }
+                                                return true;
                                             }
                                         }
-                                        catch
-                                        {
-                                            continue;
-                                        }
                                     }
+                                    catch
+                                    {
+                                        continue;
+                                    }
+                                }
                                     break;
                                 case "user32.dll":
+                                {
+                                    try
                                     {
-                                        try
+                                        foreach (string AntiDebugFunction in User32AntiDebugFunctions)
                                         {
-                                            foreach (string AntiDebugFunction in User32AntiDebugFunctions)
+                                            IntPtr Function = LowLevelGetProcAddress(hModule, AntiDebugFunction);
+                                            byte[] FunctionBytes = new byte[1];
+                                            Marshal.Copy(Function, FunctionBytes, 0, 1);
+                                            if (FunctionBytes[0] == 0x90 || FunctionBytes[0] == 0xE9)
                                             {
-                                                IntPtr Function = LowLevelGetProcAddress(hModule, AntiDebugFunction);
-                                                byte[] FunctionBytes = new byte[1];
-                                                Marshal.Copy(Function, FunctionBytes, 0, 1);
-                                                if (FunctionBytes[0] == 0x90 || FunctionBytes[0] == 0xE9)
-                                                {
-                                                    return true;
-                                                }
+                                                return true;
                                             }
                                         }
-                                        catch
-                                        {
-                                            continue;
-                                        }
                                     }
+                                    catch
+                                    {
+                                        continue;
+                                    }
+                                }
                                     break;
                                 case "win32u.dll":
+                                {
+                                    try
                                     {
-                                        try
+                                        foreach (string AntiDebugFunction in Win32uAntiDebugFunctions)
                                         {
-                                            foreach (string AntiDebugFunction in Win32uAntiDebugFunctions)
+                                            IntPtr Function = LowLevelGetProcAddress(hModule, AntiDebugFunction);
+                                            byte[] FunctionBytes = new byte[1];
+                                            Marshal.Copy(Function, FunctionBytes, 0, 1);
+                                            if (FunctionBytes[0] == 255 || FunctionBytes[0] == 0x90 ||
+                                                FunctionBytes[0] == 0xE9)
                                             {
-                                                IntPtr Function = LowLevelGetProcAddress(hModule, AntiDebugFunction);
-                                                byte[] FunctionBytes = new byte[1];
-                                                Marshal.Copy(Function, FunctionBytes, 0, 1);
-                                                if (FunctionBytes[0] == 255 || FunctionBytes[0] == 0x90 || FunctionBytes[0] == 0xE9)
-                                                {
-                                                    return true;
-                                                }
+                                                return true;
                                             }
                                         }
-                                        catch
-                                        {
-                                            continue;
-                                        }
                                     }
+                                    catch
+                                    {
+                                        continue;
+                                    }
+                                }
                                     break;
                             }
                         }
                     }
+
                     return false;
                 }
 
                 bool CheckForBlacklistedNames()
                 {
-                    string[] BadNames = { "Johnson", "Miller", "malware", "maltest", "CurrentUser", "Sandbox", "virus", "John Doe", "test user", "sand box", "WDAGUtilityAccount" };
+                    string[] BadNames =
+                    {
+                        "Johnson", "Miller", "malware", "maltest", "CurrentUser", "Sandbox", "virus", "John Doe",
+                        "test user", "sand box", "WDAGUtilityAccount"
+                    };
                     string Username = Environment.UserName.ToLower();
                     return BadNames.Any(x => x.ToLower() == Username);
                 }
 
                 bool CheckForVMwareAndVirtualBox()
                 {
-                    using (ManagementObjectSearcher ObjectSearcher = new ManagementObjectSearcher("Select * from Win32_ComputerSystem"))
+                    using (ManagementObjectSearcher ObjectSearcher =
+                           new ManagementObjectSearcher("Select * from Win32_ComputerSystem"))
                     {
                         using (ManagementObjectCollection ObjectItems = ObjectSearcher.Get())
                         {
@@ -666,15 +731,19 @@ namespace Kanye4King
                             {
                                 string ManufacturerString = Item["Manufacturer"].ToString();
                                 string ModelName = Item["Model"].ToString();
-                                if (ManufacturerString.Contains("microsoft corporation", StringComparison.OrdinalIgnoreCase)
-                                 && ModelName.Contains("virtual", StringComparison.OrdinalIgnoreCase) || ManufacturerString.Contains("vmware", StringComparison.OrdinalIgnoreCase))
+                                if (ManufacturerString.Contains("microsoft corporation",
+                                        StringComparison.OrdinalIgnoreCase)
+                                    && ModelName.Contains("virtual", StringComparison.OrdinalIgnoreCase) ||
+                                    ManufacturerString.Contains("vmware", StringComparison.OrdinalIgnoreCase))
                                 {
                                     return true;
                                 }
                             }
                         }
                     }
-                    using (ManagementObjectSearcher ObjectSearcher = new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_VideoController"))
+
+                    using (ManagementObjectSearcher ObjectSearcher =
+                           new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_VideoController"))
                     {
                         using (ManagementObjectCollection ObjectItems = ObjectSearcher.Get())
                         {
@@ -695,7 +764,8 @@ namespace Kanye4King
                 bool CheckForKVM()
                 {
                     string[] BadDriversList = { "balloon.sys", "netkvm.sys", "vioinput", "viofs.sys", "vioser.sys" };
-                    foreach (string Drivers in Directory.GetFiles(Environment.GetFolderPath(Environment.SpecialFolder.System), "*"))
+                    foreach (string Drivers in Directory.GetFiles(
+                                 Environment.GetFolderPath(Environment.SpecialFolder.System), "*"))
                     {
                         foreach (string BadDrivers in BadDriversList)
                         {
@@ -728,6 +798,7 @@ namespace Kanye4King
                                 return true;
                         }
                     }
+
                     return false;
                 }
 
@@ -735,16 +806,22 @@ namespace Kanye4King
                 {
                     try
                     {
-                        string[] BadFileNames = { "VBoxMouse.sys", "VBoxGuest.sys", "VBoxSF.sys", "VBoxVideo.sys", "vmmouse.sys", "vboxogl.dll" };
-                        string[] BadDirs = { @"C:\Program Files\VMware", @"C:\Program Files\oracle\virtualbox guest additions" };
-                        foreach (string System32File in Directory.GetFiles(Environment.GetFolderPath(Environment.SpecialFolder.System)))
+                        string[] BadFileNames =
+                        {
+                            "VBoxMouse.sys", "VBoxGuest.sys", "VBoxSF.sys", "VBoxVideo.sys", "vmmouse.sys",
+                            "vboxogl.dll"
+                        };
+                        string[] BadDirs =
+                            { @"C:\Program Files\VMware", @"C:\Program Files\oracle\virtualbox guest additions" };
+                        foreach (string System32File in Directory.GetFiles(
+                                     Environment.GetFolderPath(Environment.SpecialFolder.System)))
                         {
                             try
                             {
                                 foreach (string BadFileName in BadFileNames)
                                 {
-
-                                    if (File.Exists(System32File) && Path.GetFileName(System32File).ToLower() == BadFileName.ToLower())
+                                    if (File.Exists(System32File) && Path.GetFileName(System32File).ToLower() ==
+                                        BadFileName.ToLower())
                                     {
                                         return true;
                                     }
@@ -766,8 +843,8 @@ namespace Kanye4King
                     }
                     catch
                     {
-
                     }
+
                     return false;
                 }
 
@@ -851,12 +928,10 @@ namespace Kanye4King
 
         public void CheckSubs()
         {
-            
             Name = "Kanye4King";
             Type = AccessType.Debug;
-            
         }
-        
+
         private string BuildHwid()
         {
             string GetHardwareInfo(string WIN32_Class, params string[] ClassItemFields)
@@ -867,15 +942,15 @@ namespace Kanye4King
                 try
                 {
                     foreach (ManagementObject obj in searcher.Get())
-                        foreach (var ClassItemField in ClassItemFields)
-                            if (ClassItemField == "Capacity")
-                            {
-                                result.Add($"{((UInt64)obj[ClassItemField] / 1073741824.0)}GB");
-                            }
-                            else
-                            {
-                                result.Add(obj[ClassItemField]?.ToString().Trim());
-                            }
+                    foreach (var ClassItemField in ClassItemFields)
+                        if (ClassItemField == "Capacity")
+                        {
+                            result.Add($"{((UInt64)obj[ClassItemField] / 1073741824.0)}GB");
+                        }
+                        else
+                        {
+                            result.Add(obj[ClassItemField]?.ToString().Trim());
+                        }
                 }
                 catch (Exception ex)
                 {
@@ -920,8 +995,6 @@ namespace Kanye4King
                 foreach (var junk in tmJunk)
                     str = str.Replace(junk, "");
                 return str;
-
-                
             }
 
             var plain =
@@ -935,6 +1008,7 @@ namespace Kanye4King
 
             return crypto.Encrypt(plain).ToHexString();
         }
+
         public enum AccessType
         {
             Free = 0,
@@ -943,6 +1017,7 @@ namespace Kanye4King
             Full = 3,
             Debug = 4
         }
+
         class PC_Info
         {
             public string Username { get; set; }
@@ -956,30 +1031,41 @@ namespace Kanye4King
         }
 
 
-
         #region DEFINITIONS
+
         private static uint SystemCodeIntegrityInformation = 0x67;
         const long CONTEXT_DEBUG_REGISTERS = 0x00010000L | 0x00000010L;
+
         #endregion
 
         #region IMPORTS
-        [DllImport("ntdll.dll", SetLastError = true)]
-        private static extern uint NtQuerySystemInformation(uint SystemInformationClass, ref Structs.SYSTEM_CODEINTEGRITY_INFORMATION SystemInformation, uint SystemInformationLength, out uint ReturnLength);
 
         [DllImport("ntdll.dll", SetLastError = true)]
-        private static extern uint NtQuerySystemInformation(uint SystemInformationClass, ref Structs.SYSTEM_KERNEL_DEBUGGER_INFORMATION SystemInformation, uint SystemInformationLength, out uint ReturnLength);
+        private static extern uint NtQuerySystemInformation(uint SystemInformationClass,
+            ref Structs.SYSTEM_CODEINTEGRITY_INFORMATION SystemInformation, uint SystemInformationLength,
+            out uint ReturnLength);
+
+        [DllImport("ntdll.dll", SetLastError = true)]
+        private static extern uint NtQuerySystemInformation(uint SystemInformationClass,
+            ref Structs.SYSTEM_KERNEL_DEBUGGER_INFORMATION SystemInformation, uint SystemInformationLength,
+            out uint ReturnLength);
 
         [DllImport("ntdll.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-        private static extern void RtlInitUnicodeString(out Structs.UNICODE_STRING DestinationString, string SourceString);
+        private static extern void RtlInitUnicodeString(out Structs.UNICODE_STRING DestinationString,
+            string SourceString);
 
         [DllImport("ntdll.dll", SetLastError = true, CharSet = CharSet.Ansi)]
-        private static extern void RtlUnicodeStringToAnsiString(out Structs.ANSI_STRING DestinationString, Structs.UNICODE_STRING UnicodeString, bool AllocateDestinationString);
+        private static extern void RtlUnicodeStringToAnsiString(out Structs.ANSI_STRING DestinationString,
+            Structs.UNICODE_STRING UnicodeString, bool AllocateDestinationString);
 
         [DllImport("ntdll.dll", SetLastError = true)]
-        private static extern uint LdrGetDllHandle([MarshalAs(UnmanagedType.LPWStr)] string DllPath, [MarshalAs(UnmanagedType.LPWStr)] string DllCharacteristics, Structs.UNICODE_STRING LibraryName, ref IntPtr DllHandle);
+        private static extern uint LdrGetDllHandle([MarshalAs(UnmanagedType.LPWStr)] string DllPath,
+            [MarshalAs(UnmanagedType.LPWStr)] string DllCharacteristics, Structs.UNICODE_STRING LibraryName,
+            ref IntPtr DllHandle);
 
         [DllImport("ntdll.dll", SetLastError = true, CharSet = CharSet.Ansi)]
-        private static extern uint LdrGetProcedureAddress(IntPtr Module, Structs.ANSI_STRING ProcedureName, ushort ProcedureNumber, out IntPtr FunctionHandle);
+        private static extern uint LdrGetProcedureAddress(IntPtr Module, Structs.ANSI_STRING ProcedureName,
+            ushort ProcedureNumber, out IntPtr FunctionHandle);
 
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern bool SetHandleInformation(IntPtr hObject, uint dwMask, uint dwFlags);
@@ -1003,10 +1089,12 @@ namespace Kanye4King
         private static extern IntPtr GetProcAddress(IntPtr ModuleHandle, string Function);
 
         [DllImport("kernel32.dll", SetLastError = true)]
-        private static extern bool WriteProcessMemory(SafeHandle ProcHandle, IntPtr BaseAddress, byte[] Buffer, uint size, int NumOfBytes);
+        private static extern bool WriteProcessMemory(SafeHandle ProcHandle, IntPtr BaseAddress, byte[] Buffer,
+            uint size, int NumOfBytes);
 
         [DllImport("ntdll.dll", SetLastError = true)]
-        private static extern uint NtSetInformationThread(IntPtr ThreadHandle, uint ThreadInformationClass, IntPtr ThreadInformation, int ThreadInformationLength);
+        private static extern uint NtSetInformationThread(IntPtr ThreadHandle, uint ThreadInformationClass,
+            IntPtr ThreadInformation, int ThreadInformationLength);
 
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern IntPtr OpenThread(uint DesiredAccess, bool InheritHandle, int ThreadId);
@@ -1024,16 +1112,20 @@ namespace Kanye4King
         private static extern bool GetThreadContext(IntPtr hThread, ref Structs.CONTEXT Context);
 
         [DllImport("ntdll.dll", SetLastError = true)]
-        private static extern uint NtQueryInformationProcess(SafeHandle hProcess, uint ProcessInfoClass, out uint ProcessInfo, uint nSize, uint ReturnLength);
+        private static extern uint NtQueryInformationProcess(SafeHandle hProcess, uint ProcessInfoClass,
+            out uint ProcessInfo, uint nSize, uint ReturnLength);
 
         [DllImport("ntdll.dll", SetLastError = true)]
-        private static extern uint NtQueryInformationProcess(SafeHandle hProcess, uint ProcessInfoClass, out IntPtr ProcessInfo, uint nSize, uint ReturnLength);
+        private static extern uint NtQueryInformationProcess(SafeHandle hProcess, uint ProcessInfoClass,
+            out IntPtr ProcessInfo, uint nSize, uint ReturnLength);
 
         [DllImport("ntdll.dll", SetLastError = true)]
-        private static extern uint NtQueryInformationProcess(SafeHandle hProcess, uint ProcessInfoClass, ref Structs.PROCESS_BASIC_INFORMATION ProcessInfo, uint nSize, uint ReturnLength);
+        private static extern uint NtQueryInformationProcess(SafeHandle hProcess, uint ProcessInfoClass,
+            ref Structs.PROCESS_BASIC_INFORMATION ProcessInfo, uint nSize, uint ReturnLength);
 
         [DllImport("kernel32.dll", SetLastError = true)]
-        private static extern int QueryFullProcessImageNameA(SafeHandle hProcess, uint Flags, byte[] lpExeName, Int32[] lpdwSize);
+        private static extern int QueryFullProcessImageNameA(SafeHandle hProcess, uint Flags, byte[] lpExeName,
+            Int32[] lpdwSize);
 
         [DllImport("user32.dll", SetLastError = true)]
         private static extern IntPtr GetForegroundWindow();
@@ -1045,16 +1137,20 @@ namespace Kanye4King
         private static extern int GetWindowTextA(IntPtr HWND, StringBuilder WindowText, int nMaxCount);
 
         [DllImport("kernel32.dll", SetLastError = true)]
-        private static extern bool WriteProcessMemory(IntPtr ProcHandle, IntPtr BaseAddress, byte[] Buffer, uint size, int NumOfBytes);
+        private static extern bool WriteProcessMemory(IntPtr ProcHandle, IntPtr BaseAddress, byte[] Buffer, uint size,
+            int NumOfBytes);
 
         [DllImport("kernel32.dll", SetLastError = true)]
         private static extern bool IsProcessCritical(IntPtr Handle, ref bool BoolToCheck);
 
         [DllImport("kernel32.dll", SetLastError = true)]
-        static extern bool SetProcessMitigationPolicy(int policy, ref Structs.PROCESS_MITIGATION_BINARY_SIGNATURE_POLICY lpBuffer, int size);
+        static extern bool SetProcessMitigationPolicy(int policy,
+            ref Structs.PROCESS_MITIGATION_BINARY_SIGNATURE_POLICY lpBuffer, int size);
+
         #endregion
 
         #region DEBUG
+
         public static bool GetTickCountAntiDebug()
         {
             uint Start = GetTickCount();
@@ -1097,11 +1193,14 @@ namespace Kanye4King
                     CleanedPath += Null;
                 }
             }
+
             return CleanedPath;
         }
+
         #endregion
 
         #region DLL
+
         public static bool PatchLoadLibraryA()
         {
             IntPtr KernelModule = GetModuleHandle("kernelbase.dll");
@@ -1120,15 +1219,21 @@ namespace Kanye4King
 
         public static bool BinaryImageSignatureMitigationAntiDllInjection()
         {
-            Structs.PROCESS_MITIGATION_BINARY_SIGNATURE_POLICY OnlyMicrosoftBinaries = new Structs.PROCESS_MITIGATION_BINARY_SIGNATURE_POLICY();
+            Structs.PROCESS_MITIGATION_BINARY_SIGNATURE_POLICY OnlyMicrosoftBinaries =
+                new Structs.PROCESS_MITIGATION_BINARY_SIGNATURE_POLICY();
             OnlyMicrosoftBinaries.MicrosoftSignedOnly = 1;
-            return SetProcessMitigationPolicy(8, ref OnlyMicrosoftBinaries, Marshal.SizeOf(typeof(Structs.PROCESS_MITIGATION_BINARY_SIGNATURE_POLICY)));
+            return SetProcessMitigationPolicy(8, ref OnlyMicrosoftBinaries,
+                Marshal.SizeOf(typeof(Structs.PROCESS_MITIGATION_BINARY_SIGNATURE_POLICY)));
         }
+
         #endregion
 
         #region MISC
+
         [DllImport("ntdll.dll")]
-        private static extern int NtSetInformationProcess(IntPtr process, int process_cass, ref int process_value, int length);
+        private static extern int NtSetInformationProcess(IntPtr process, int process_cass, ref int process_value,
+            int length);
+
         public static void BSOD()
         {
             Process.EnterDebugMode();
@@ -1136,6 +1241,7 @@ namespace Kanye4King
             NtSetInformationProcess(Process.GetCurrentProcess().Handle, 0x1D, ref status, sizeof(int));
             Process.GetCurrentProcess().Kill();
         }
+
         #endregion
     }
 }

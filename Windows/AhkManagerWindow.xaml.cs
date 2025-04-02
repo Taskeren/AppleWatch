@@ -67,6 +67,7 @@ namespace Kanye4King
             Logger.Debug($"Started {name} with pid {Ahks[name]}");
             return true;
         }
+
         public static bool TryStopAhk(string name)
         {
             if (Ahks.ContainsKey(name))
@@ -125,7 +126,7 @@ namespace Kanye4King
 
             IntPtr shellWindow = GetShellWindow();
 
-            EnumWindows(delegate (IntPtr IntPtr, int lParam)
+            EnumWindows(delegate(IntPtr IntPtr, int lParam)
             {
                 if (IntPtr == shellWindow) return true;
 
@@ -155,9 +156,9 @@ namespace Kanye4King
                 //Logger.Debug($"Process id is {processID}");
                 Ahks[name] = (int)processID;
                 return true;
-
             }, 0);
         }
+
         delegate bool EnumWindowsProc(IntPtr IntPtr, int lParam);
     }
 
@@ -165,7 +166,7 @@ namespace Kanye4King
     {
         const string tempvar = "q7i";
         Dictionary<string, int> Ahks => AhkManager.Ahks;
-        
+
         public AhkManagerWindow()
         {
             InitializeComponent();
@@ -187,7 +188,11 @@ namespace Kanye4King
                 var sp = new StackPanel();
                 var cb = new Controls.Checkbox() { Name = tempvar + name.Replace(" ", tempvar) };
                 cb.Click += Checkbox_Click;
-                var tb = new TextBlock() { Text = name, Foreground = Application.Current.Resources["AccentColor"] as SolidColorBrush, Opacity = 0.8 };
+                var tb = new TextBlock()
+                {
+                    Text = name, Foreground = Application.Current.Resources["AccentColor"] as SolidColorBrush,
+                    Opacity = 0.8
+                };
 
                 cb.SetState(s.Value > 0);
                 sp.Children.Add(cb);
@@ -196,7 +201,6 @@ namespace Kanye4King
             }
         }
 
-        
 
         private void Checkbox_Click(object sender, RoutedEventArgs e)
         {

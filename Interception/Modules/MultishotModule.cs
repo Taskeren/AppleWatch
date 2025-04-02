@@ -1,9 +1,7 @@
 ﻿using RateLimiter;
-
 using Kanye4King.Models;
 using Kanye4King.Utility;
 using Kanye4King.Windows;
-
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -14,7 +12,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows.Media;
 
-namespace Kanye4King.Interception.Modules 
+namespace Kanye4King.Interception.Modules
 {
     public class MultishotModule : PacketModuleBase
     {
@@ -31,7 +29,8 @@ namespace Kanye4King.Interception.Modules
         // TODO: Add manual buffering for each direction
         // Add rpm control on inject
 
-        public MultishotModule() : base("Multishot", false, InterceptionManager.GetProvider("Players"), InterceptionManager.GetProvider("Xbox"))
+        public MultishotModule() : base("Multishot", false, InterceptionManager.GetProvider("Players"),
+            InterceptionManager.GetProvider("Xbox"))
         {
             Icon = System.Windows.Application.Current.FindResource("CrosshairIcon") as Geometry;
             Description = "Multiplies shots made shortly after activation";
@@ -71,6 +70,7 @@ namespace Kanye4King.Interception.Modules
         }
 
         public static List<Keycode> PlayersKeybind = new List<Keycode>();
+
         private void PlayersKeybindHandler(LinkedList<Keycode> keycodes)
         {
             if (!KeybindChecks()) return;
@@ -80,7 +80,7 @@ namespace Kanye4King.Interception.Modules
             if (PlayersKeybind.All(x => keycodes.Contains(x)))
             {
                 PlayersMode = !PlayersMode;
-                
+
                 MainWindow.Instance.Dispatcher.BeginInvoke(() =>
                 {
                     EnableSound.Play();
@@ -122,7 +122,8 @@ namespace Kanye4King.Interception.Modules
             correction = DateTime.Now;
 
             var date = DateTime.Now - shotTimeout;
-            var shots = playersProvider.CurrentQueue.Where(x => x.CreatedAt > date).ToArray().Where(x => x.IsOutboundShot());
+            var shots = playersProvider.CurrentQueue.Where(x => x.CreatedAt > date).ToArray()
+                .Where(x => x.IsOutboundShot());
             if (shots.Any())
             {
                 foreach (var addr in shots.Select(x => x.RemoteAddress).Distinct())
@@ -170,6 +171,7 @@ namespace Kanye4King.Interception.Modules
 
         TimeSpan shotTimeout = TimeSpan.FromSeconds(0.75);
         TimeSpan timeLimit => TimeSpan.FromSeconds(MaxTime);
+
         public override bool AllowPacket(Packet p)
         {
             if (!base.AllowPacket(p)) return false;
@@ -211,6 +213,7 @@ namespace Kanye4King.Interception.Modules
         }
 
         const int pveDropPacketsAmount = 20; // 5/10 - x2 / 12/15 - x3
+
         bool Handle3074(Packet p)
         {
             if (!IsActivated || !block || PlayersMode) return true;
@@ -241,6 +244,7 @@ namespace Kanye4King.Interception.Modules
         }
 
         DateTime correction = DateTime.MinValue;
+
         bool Handle27K(Packet p)
         {
             if (!PlayersMode && !WaitShot) return true;

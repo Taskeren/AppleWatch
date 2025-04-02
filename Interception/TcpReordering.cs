@@ -1,6 +1,5 @@
 ﻿using Kanye4King.Interception.Modules;
 using Kanye4King.Models;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -66,7 +65,8 @@ namespace Kanye4King.Interception
 
             if (p.SeqNum == 0)
             {
-                p.SeqNum = p.ParseResult.TcpHeader->SeqNum = cache.Location[type].HighSeq + cache.Location[type].LastLength;
+                p.SeqNum = p.ParseResult.TcpHeader->SeqNum =
+                    cache.Location[type].HighSeq + cache.Location[type].LastLength;
                 Logger.Debug($"Seq set to {p.ParseResult.TcpHeader->SeqNum}");
             }
 
@@ -82,6 +82,7 @@ namespace Kanye4King.Interception
                 p.ParseResult.TcpHeader->AckNum = cache.Location[type].HighAck;
                 Logger.Debug($"Ack set to {p.ParseResult.TcpHeader->AckNum}");
             }
+
             p.Recalc();
         }
 
@@ -119,7 +120,7 @@ namespace Kanye4King.Interception
             var copy = p.Clone();
             copy.Delayed = true;
             cache.Location[type].Blocked.Add(copy);
-            
+
             if (remove.Any())
             {
                 foreach (var pr in remove)
@@ -131,7 +132,7 @@ namespace Kanye4King.Interception
                 Logger.Debug($"Updated {remove.Length} packets with stacked");
             }
         }
-        
+
         public static unsafe void onPass(this Packet p)
         {
             if (p.Delayed) return;
@@ -152,12 +153,13 @@ namespace Kanye4King.Interception
                 cache.Location[type].LastLength = (uint)p.Length;
             }
 
-            else if (cache.Location[type].HighSeq - p.SeqNum > reset) // wrong values handling (cuz I dont watch rst, syn, fin TODO:)
+            else if
+                (cache.Location[type].HighSeq - p.SeqNum >
+                 reset) // wrong values handling (cuz I dont watch rst, syn, fin TODO:)
             {
                 cache.Location[type].HighSeq = p.SeqNum.Value;
                 cache.Location[type].LastLength = (uint)p.Length;
             }
-
 
 
             if (!p.AckNum.HasValue || p.AckNum == 0) return;
@@ -167,7 +169,9 @@ namespace Kanye4King.Interception
                 cache.Location[type].HighAck = p.AckNum.Value;
             }
 
-            else if (cache.Location[type].HighAck - p.AckNum > reset) // wrong values handling (cuz I dont watch rst, syn, fin TODO:)
+            else if
+                (cache.Location[type].HighAck - p.AckNum >
+                 reset) // wrong values handling (cuz I dont watch rst, syn, fin TODO:)
             {
                 cache.Location[type].HighAck = p.AckNum.Value;
                 cache.Location[type].LastLength = (uint)p.Length;
@@ -176,14 +180,16 @@ namespace Kanye4King.Interception
             if (p.Length == 0) return;
 
             if (cache.Location[type].Blocked.Any())
-            { // на самом деле я не отправлял
-                var sum = cache.Location[type].Blocked .Sum(x => x.Length);
+            {
+                // на самом деле я не отправлял
+                var sum = cache.Location[type].Blocked.Sum(x => x.Length);
                 //p.ParseResult.TcpHeader->SeqNum -= (uint)sum;
                 //Logger.Debug($"- {sum}");
             }
 
             if (cache.Location[otherType].Blocked.Any())
-            { // на самом деле я их получил
+            {
+                // на самом деле я их получил
                 var sum = cache.Location[otherType].Blocked.Sum(x => x.Length);
                 //p.ParseResult.TcpHeader->AckNum += (uint)sum;
                 //Logger.Debug($"+ {sum}");

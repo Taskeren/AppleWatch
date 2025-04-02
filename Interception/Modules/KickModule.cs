@@ -1,5 +1,4 @@
 ﻿using Kanye4King.Models;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,10 +11,12 @@ namespace Kanye4King.Interception.Modules
     public class KickModule : PacketModuleBase
     {
         public bool Host { get; set; }
+
         public KickModule() : base("Kick", true, InterceptionManager.GetProvider("Players"))
         {
             Icon = System.Windows.Application.Current.FindResource("DisconnectIcon") as Geometry;
         }
+
         public override void Toggle()
         {
             IsActivated = !IsActivated;
@@ -24,6 +25,7 @@ namespace Kanye4King.Interception.Modules
 
         DateTime inLast;
         int[] Reconnect = new int[] { 1300, 100, 315 };
+
         public override bool AllowPacket(Packet p)
         {
             if (!base.AllowPacket(p)) return false;
@@ -53,7 +55,8 @@ namespace Kanye4King.Interception.Modules
                 if (p.Outbound && inLast == DateTime.MinValue && p.Length == 1300)
                     inLast = DateTime.Now;
 
-                if (inLast != DateTime.MinValue && DateTime.Now - inLast > TimeSpan.FromSeconds(26)) // 25 kicked then beaver
+                if (inLast != DateTime.MinValue &&
+                    DateTime.Now - inLast > TimeSpan.FromSeconds(26)) // 25 kicked then beaver
                 {
                     Logger.Debug($"{Name}: Disabled cuz timeout");
                     ForceDisable();

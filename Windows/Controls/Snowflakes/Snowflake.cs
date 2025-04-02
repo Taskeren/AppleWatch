@@ -6,6 +6,7 @@ namespace WpfSnowfall.Snowflakes;
 public partial class Snowflake : UserControl
 {
     private const int _totalVariants = 4;
+
     public static UserControl Generate(int? variant = null)
     {
         var random = variant ?? new Random().Next(0, _totalVariants);

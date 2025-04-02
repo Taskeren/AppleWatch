@@ -43,6 +43,7 @@ namespace Kanye4King
         }
 
         static Dictionary<string, DateTime> cache = new Dictionary<string, DateTime>();
+
         public static void Error(Exception ex, string additionalInfo = "")
         {
             var message =
@@ -64,6 +65,7 @@ namespace Kanye4King
             {
                 TgLog(message);
             }
+
             message = message[..Math.Min(250, message.Length)];
             if (MainWindow.Instance != null)
             {
@@ -72,7 +74,7 @@ namespace Kanye4King
             }
             else if (StartupProgressBar.Instance != null)
             {
-             //   StartupProgressBar.Instance.Checker.AuthApp.log(message);
+                //   StartupProgressBar.Instance.Checker.AuthApp.log(message);
                 return;
             }
         }
@@ -84,7 +86,8 @@ namespace Kanye4King
                 using var wc = new WebClient();
                 message = message.TrimEnd();
                 message = message[..Math.Min(1024, message.Length)];
-                string url = $"https://api.telegram.org/bot{token}/sendMessage?chat_id={chatId}&text={Uri.EscapeDataString(message)}";
+                string url =
+                    $"https://api.telegram.org/bot{token}/sendMessage?chat_id={chatId}&text={Uri.EscapeDataString(message)}";
                 wc.DownloadString(url);
             }
             catch (Exception)
@@ -96,22 +99,16 @@ namespace Kanye4King
 
     class LocationResponse
     {
-        [JsonPropertyName("query")]
-        public string Query { get; set; }
+        [JsonPropertyName("query")] public string Query { get; set; }
 
-        [JsonPropertyName("country")]
-        public string Country { get; set; }
+        [JsonPropertyName("country")] public string Country { get; set; }
 
-        [JsonPropertyName("regionName")]
-        public string RegionName { get; set; }
+        [JsonPropertyName("regionName")] public string RegionName { get; set; }
 
-        [JsonPropertyName("city")]
-        public string City { get; set; }
+        [JsonPropertyName("city")] public string City { get; set; }
 
-        [JsonPropertyName("proxy")]
-        public bool Proxy { get; set; }
+        [JsonPropertyName("proxy")] public bool Proxy { get; set; }
 
-        [JsonPropertyName("hosting")]
-        public bool Hosting { get; set; }
+        [JsonPropertyName("hosting")] public bool Hosting { get; set; }
     }
 }

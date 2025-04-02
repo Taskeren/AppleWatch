@@ -3,7 +3,6 @@ using DotNetBungieAPI.Models.Destiny;
 using DotNetBungieAPI.Models;
 using DotNetBungieAPI.Models.User;
 using DotNetBungieAPI.Service.Abstractions;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,7 +24,8 @@ namespace Kanye4King.Utility
     {
         static D2CharacterTracker()
         {
-            client = BungieApiBuilder.GetApiClient((c) => c.ClientConfiguration.ApiKey = "ddfaa5efdab14680a2637d8374c8ae72");
+            client = BungieApiBuilder.GetApiClient((c) =>
+                c.ClientConfiguration.ApiKey = "ddfaa5efdab14680a2637d8374c8ae72");
         }
 
         static IBungieClient client;
@@ -34,15 +34,23 @@ namespace Kanye4King.Utility
         public static DestinyCharacterActivitiesComponent ActiveCharacter { get; set; }
         public static DestinyCharacterComponent[] UserChars { get; private set; }
         public static List<DestinyHistoricalStatsPeriodGroup> UserActivities { get; private set; }
-        public static Dictionary<DestinyCharacterComponent, List<DestinyHistoricalStatsPeriodGroup>> CharacterActivities { get; private set; }
 
-        public static int RaidsCount => 
-            User is null || UserActivities is null ? 0 : 
-            UserActivities.ToArray()
-                .Count(x => 
-                    ((Config.Instance.Settings.Tracker_CountRaids && x.ActivityDetails.Mode == DestinyActivityModeType.Raid) || 
-                    (Config.Instance.Settings.Tracker_CountDungeons && x.ActivityDetails.Mode == DestinyActivityModeType.Dungeon)) &&
-                x.Values.TryGetValue("completed", out var c) && c.BasicValue.Value > 0);
+        public static Dictionary<DestinyCharacterComponent, List<DestinyHistoricalStatsPeriodGroup>> CharacterActivities
+        {
+            get;
+            private set;
+        }
+
+        public static int RaidsCount =>
+            User is null || UserActivities is null
+                ? 0
+                : UserActivities.ToArray()
+                    .Count(x =>
+                        ((Config.Instance.Settings.Tracker_CountRaids &&
+                          x.ActivityDetails.Mode == DestinyActivityModeType.Raid) ||
+                         (Config.Instance.Settings.Tracker_CountDungeons &&
+                          x.ActivityDetails.Mode == DestinyActivityModeType.Dungeon)) &&
+                        x.Values.TryGetValue("completed", out var c) && c.BasicValue.Value > 0);
 
         public static string BungieName { get; private set; }
         public static short Delimeter { get; private set; }
@@ -58,9 +66,12 @@ namespace Kanye4King.Utility
 
             return await TrySetUser(m.Groups[1].Value, short.Parse(m.Groups[2].Value));
         }
+
         public static async Task<bool> TrySetUser(string name, short delimeter)
         {
-            var playerResult = await client.ApiAccess.Destiny2.SearchDestinyPlayerByBungieName(BungieMembershipType.All, new DotNetBungieAPI.Models.Requests.ExactSearchRequest() { DisplayName = name, DisplayNameCode = delimeter });
+            var playerResult = await client.ApiAccess.Destiny2.SearchDestinyPlayerByBungieName(BungieMembershipType.All,
+                new DotNetBungieAPI.Models.Requests.ExactSearchRequest()
+                    { DisplayName = name, DisplayNameCode = delimeter });
             if (!playerResult.Response.Any())
             {
                 Logger.Debug("User not found");
@@ -68,8 +79,9 @@ namespace Kanye4King.Utility
             }
 
             var user = playerResult.Response.First();
-            var profileData = await client.ApiAccess.Destiny2.GetProfile(user.MembershipType, user.MembershipId, 
-                new DestinyComponentType[] { DestinyComponentType.Characters, DestinyComponentType.CharacterActivities });
+            var profileData = await client.ApiAccess.Destiny2.GetProfile(user.MembershipType, user.MembershipId,
+                new DestinyComponentType[]
+                    { DestinyComponentType.Characters, DestinyComponentType.CharacterActivities });
 
             if (!profileData.Response.CharacterActivities.Data.Any())
             {
@@ -91,7 +103,8 @@ namespace Kanye4King.Utility
             foreach (var character in profileData.Response.Characters.Data.Values)
             {
                 UserChars[i++] = character;
-                var activitiesResponse = await client.ApiAccess.Destiny2.GetActivityHistory(user.MembershipType, user.MembershipId, character.CharacterId, 100);
+                var activitiesResponse = await client.ApiAccess.Destiny2.GetActivityHistory(user.MembershipType,
+                    user.MembershipId, character.CharacterId, 100);
                 CharacterActivities[character] = activitiesResponse.Response.Activities
                     .Where(x => x.Period > reset)
                     .OrderByDescending(x => x.Period).ToList();
@@ -106,8 +119,8 @@ namespace Kanye4King.Utility
         }
 
 
-
         static List<DateTime> usedStarts = new List<DateTime>();
+
         public static async Task Update()
         {
             await UpdateHistory();
@@ -116,10 +129,12 @@ namespace Kanye4King.Utility
             if (ActiveCharacter is null)
             {
                 Logger.Debug("no active char");
-                return; 
+                return;
             }
 
-            var savedTime = UserActivities.Any() ? UserActivities.First().Period.ToLocalTime().AddSeconds(5) : DateTime.MinValue;
+            var savedTime = UserActivities.Any()
+                ? UserActivities.First().Period.ToLocalTime().AddSeconds(5)
+                : DateTime.MinValue;
             var apiTime = ActiveCharacter.DateActivityStarted.ToLocalTime();
 
             if (savedTime > apiTime)
@@ -128,7 +143,8 @@ namespace Kanye4King.Utility
                 return;
             }
 
-            if (XboxProvider.InstanceStarted != DateTime.MinValue && XboxProvider.InstanceStarted != apiTime && !usedStarts.Contains(apiTime))
+            if (XboxProvider.InstanceStarted != DateTime.MinValue && XboxProvider.InstanceStarted != apiTime &&
+                !usedStarts.Contains(apiTime))
             {
                 XboxProvider.InstanceStarted = apiTime;
                 Logger.Debug($"Saved: {savedTime}");
@@ -137,6 +153,7 @@ namespace Kanye4King.Utility
         }
 
         static DateTime lastActivityHistoryUpdate = DateTime.MinValue;
+
         static async Task UpdateHistory()
         {
             if (User is null && !await TryLoadFromConfig())
@@ -149,7 +166,8 @@ namespace Kanye4King.Utility
             {
                 foreach (var character in UserChars)
                 {
-                    var activitiesResponse = await client.ApiAccess.Destiny2.GetActivityHistory(User.MembershipType, User.MembershipId, character.CharacterId, 15);
+                    var activitiesResponse = await client.ApiAccess.Destiny2.GetActivityHistory(User.MembershipType,
+                        User.MembershipId, character.CharacterId, 15);
                     CharacterActivities[character].InsertRange(0, activitiesResponse.Response.Activities);
                     CharacterActivities[character] = CharacterActivities[character]
                         .Where(x => x.Period > reset)
@@ -168,6 +186,7 @@ namespace Kanye4King.Utility
         }
 
         static DateTime lastCurrentActivityUpdate = DateTime.MinValue;
+
         static async Task UpdateCurrent()
         {
             if (User is null && !await TryLoadFromConfig())
@@ -178,16 +197,17 @@ namespace Kanye4King.Utility
 
             try
             {
-                var profileData = await client.ApiAccess.Destiny2.GetProfile(User.MembershipType, User.MembershipId, new DestinyComponentType[] { DestinyComponentType.CharacterActivities });
-                ActiveCharacter = profileData.Response.CharacterActivities.Data.Values.FirstOrDefault(x => x.CurrentActivity.HasValidHash);
+                var profileData = await client.ApiAccess.Destiny2.GetProfile(User.MembershipType, User.MembershipId,
+                    new DestinyComponentType[] { DestinyComponentType.CharacterActivities });
+                ActiveCharacter =
+                    profileData.Response.CharacterActivities.Data.Values.FirstOrDefault(x =>
+                        x.CurrentActivity.HasValidHash);
             }
             catch (Exception e)
             {
                 Logger.Error(e);
             }
         }
-
-
 
 
         // TODO: joincode from id convertion

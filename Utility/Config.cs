@@ -1,7 +1,6 @@
 ﻿using Kanye4King.Models;
 using Kanye4King.Utility;
 using Kanye4King.Interception;
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -41,6 +40,7 @@ namespace Kanye4King
             Instance.Modules[name] = new ModuleSettingsBase();
             return Instance.Modules[name];
         }
+
         public static void Load()
         {
             Instance = File.Exists(ConfigPath)

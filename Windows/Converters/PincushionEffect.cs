@@ -17,6 +17,7 @@ namespace Kanye4King.Windows
         }
 
         private static PixelShader _pixelShader = new PixelShader();
+
         public PincushionEffect()
         {
             PixelShader = _pixelShader;
@@ -29,7 +30,9 @@ namespace Kanye4King.Windows
             get { return (Brush)GetValue(InputProperty); }
             set { SetValue(InputProperty, value); }
         }
-        public static readonly DependencyProperty InputProperty = RegisterPixelShaderSamplerProperty("Input", typeof(PincushionEffect), 0);
+
+        public static readonly DependencyProperty InputProperty =
+            RegisterPixelShaderSamplerProperty("Input", typeof(PincushionEffect), 0);
 
 
         public float Width
@@ -37,21 +40,27 @@ namespace Kanye4King.Windows
             get { return (float)GetValue(WidthProperty); }
             set { SetValue(WidthProperty, value); }
         }
-        public static readonly DependencyProperty WidthProperty = DependencyProperty.Register("Width", typeof(float), typeof(PincushionEffect), new UIPropertyMetadata(0.0f, PixelShaderConstantCallback(0)));
+
+        public static readonly DependencyProperty WidthProperty = DependencyProperty.Register("Width", typeof(float),
+            typeof(PincushionEffect), new UIPropertyMetadata(0.0f, PixelShaderConstantCallback(0)));
 
         public float Height
         {
             get { return (float)GetValue(HeightProperty); }
             set { SetValue(HeightProperty, value); }
         }
-        public static readonly DependencyProperty HeightProperty = DependencyProperty.Register("Height", typeof(float), typeof(PincushionEffect), new UIPropertyMetadata(0.0f, PixelShaderConstantCallback(1)));
+
+        public static readonly DependencyProperty HeightProperty = DependencyProperty.Register("Height", typeof(float),
+            typeof(PincushionEffect), new UIPropertyMetadata(0.0f, PixelShaderConstantCallback(1)));
 
         public float Power
         {
             get { return (float)GetValue(PowerProperty); }
             set { SetValue(PowerProperty, value); }
         }
-        public static readonly DependencyProperty PowerProperty = DependencyProperty.Register("Power", typeof(float), typeof(PincushionEffect), new UIPropertyMetadata(0.0f, PixelShaderConstantCallback(2)));
+
+        public static readonly DependencyProperty PowerProperty = DependencyProperty.Register("Power", typeof(float),
+            typeof(PincushionEffect), new UIPropertyMetadata(0.0f, PixelShaderConstantCallback(2)));
 
 
         public static Uri MakePackUri(string relativeFile)

@@ -1,12 +1,10 @@
 ﻿using Kanye4King.Models;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-
 using WindivertDotnet;
 
 namespace Kanye4King.Interception.PacketProviders
@@ -27,7 +25,10 @@ namespace Kanye4King.Interception.PacketProviders
 
         protected override WinDivert CreateInstance()
         {
-            return Divert = new WinDivert(Filter.True.And(x => x.IsTcp && x.Network.RemotePort >= 30000 && x.Network.RemotePort <= 30009), WinDivertLayer.Network);
+            return Divert =
+                new WinDivert(
+                    Filter.True.And(x => x.IsTcp && x.Network.RemotePort >= 30000 && x.Network.RemotePort <= 30009),
+                    WinDivertLayer.Network);
         }
 
         public override bool AllowPacket(Packet p)
@@ -44,7 +45,8 @@ namespace Kanye4King.Interception.PacketProviders
                 }
                 else
                 {
-                    message = $"{Name}: {(p.Inbound ? "DL" : "UL")} {p.Length} - {string.Join(" > ", matchesAny.Select(x => x.Value))}";
+                    message =
+                        $"{Name}: {(p.Inbound ? "DL" : "UL")} {p.Length} - {string.Join(" > ", matchesAny.Select(x => x.Value))}";
                 }
 
                 Logger.Debug(message);

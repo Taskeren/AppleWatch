@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -22,16 +21,14 @@ namespace Kanye4King.Database
 
         public bool IsInbound { get; set; }
         public bool IsSent { get; set; }
-        [Key]
-        public ulong Id { get; set; }
+        [Key] public ulong Id { get; set; }
 
         public DateTime CreatedAt { get; set; }
     }
 
     public class DbLog
     {
-        [Key]
-        public ulong Id { get; set; }
+        [Key] public ulong Id { get; set; }
         public LogLevel Type { get; set; }
         public string? Text { get; set; }
         public DateTime CreatedAt { get; set; }

@@ -1,5 +1,4 @@
 ﻿using Kanye4King.Models;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +11,7 @@ namespace Kanye4King.Interception.Modules
     public class InstanceModule : PacketModuleBase
     {
         PacketProviderBase provider;
+
         public InstanceModule() : base("З0K", true, InterceptionManager.GetProvider("30000"))
         {
             Icon = System.Windows.Application.Current.FindResource("Traveller") as Geometry;
@@ -42,13 +42,14 @@ namespace Kanye4King.Interception.Modules
                                 p.Delayed = false;
                                 p.AckNum = 0; // let storepacket assign highest
                                 p.SourceProvider.StorePacket(p);
-                                if (Buffer && !p.Flags.HasFlag(TcpFlags.FIN) && !p.Flags.HasFlag(TcpFlags.RST)) await p.SourceProvider.SendPacket(p, true);
+                                if (Buffer && !p.Flags.HasFlag(TcpFlags.FIN) && !p.Flags.HasFlag(TcpFlags.RST))
+                                    await p.SourceProvider.SendPacket(p, true);
 
-                                Logger.Debug($"{Name}: Seq dist {TcpReordering.Cache[addr].Location[FlagType.Remote].HighSeq - p.SeqNum}");
+                                Logger.Debug(
+                                    $"{Name}: Seq dist {TcpReordering.Cache[addr].Location[FlagType.Remote].HighSeq - p.SeqNum}");
                             }
 
                             Logger.Debug($"{Name}: Sent {send.Length} on {addr}");
-
                         }
                         catch (Exception e)
                         {
@@ -60,6 +61,7 @@ namespace Kanye4King.Interception.Modules
         }
 
         public static bool Buffer;
+
         public override bool AllowPacket(Packet p)
         {
             if (!base.AllowPacket(p)) return false;

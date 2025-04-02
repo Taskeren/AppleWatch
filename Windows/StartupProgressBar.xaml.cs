@@ -1,10 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using Microsoft.VisualBasic.ApplicationServices;
-
 using Kanye4King.Database;
 using Kanye4King.Utility;
-
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -26,9 +24,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Media.Effects;
 using System.Windows.Threading;
 using System.Xml.Linq;
-
 using static System.Windows.Forms.AxHost;
-
 using Application = System.Windows.Application;
 
 namespace Kanye4King
@@ -40,7 +36,8 @@ namespace Kanye4King
 
         public StartupProgressBar()
         {
-            AppDomain.CurrentDomain.UnhandledException += new System.UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
+            AppDomain.CurrentDomain.UnhandledException +=
+                new System.UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
 
             void CurrentDomain_UnhandledException(object sender, System.UnhandledExceptionEventArgs e)
             {
@@ -49,7 +46,10 @@ namespace Kanye4King
                     Logger.Fatal(e.ExceptionObject.ToString());
                     ExtraLogger.Error(e.ExceptionObject as Exception, "Unhandled");
                 }
-                catch { }
+                catch
+                {
+                }
+
                 System.Windows.MessageBox.Show(e.ExceptionObject.ToString());
 
                 Close();
@@ -66,12 +66,18 @@ namespace Kanye4King
             login.LostFocus += (e, a) => login.Text = string.IsNullOrEmpty(login.Text) ? "Username" : login.Text;
 
             password.Password = string.IsNullOrWhiteSpace(Config.Instance.Password) ? "" : Config.Instance.Password;
-            passwordWatermark.Visibility = string.IsNullOrWhiteSpace(password.Password) ? Visibility.Visible : Visibility.Hidden;
+            passwordWatermark.Visibility =
+                string.IsNullOrWhiteSpace(password.Password) ? Visibility.Visible : Visibility.Hidden;
             password.GotFocus += (e, a) => passwordWatermark.Visibility = Visibility.Hidden;
-            password.LostFocus += (e, a) => passwordWatermark.Visibility = string.IsNullOrWhiteSpace(password.Password) ? Visibility.Visible : Visibility.Hidden;
+            password.LostFocus += (e, a) =>
+                passwordWatermark.Visibility = string.IsNullOrWhiteSpace(password.Password)
+                    ? Visibility.Visible
+                    : Visibility.Hidden;
 
             key.GotFocus += (e, a) => keyWatermark.Visibility = Visibility.Hidden;
-            key.LostFocus += (e, a) => keyWatermark.Visibility = string.IsNullOrWhiteSpace(key.Password) ? Visibility.Visible : Visibility.Hidden;
+            key.LostFocus += (e, a) =>
+                keyWatermark.Visibility =
+                    string.IsNullOrWhiteSpace(key.Password) ? Visibility.Visible : Visibility.Hidden;
 
             Checker = new IdentityChecker();
             LoginButton.IsEnabled = false;
@@ -86,8 +92,6 @@ namespace Kanye4King
             BackgroundWorker worker = new BackgroundWorker();
             worker.DoWork += async (s, e) =>
             {
-         
-
                 Instance.Dispatcher.Invoke(() =>
                 {
                     if (Instance.login.Text != "Username" && !string.IsNullOrWhiteSpace(Instance.password.Password))
@@ -99,12 +103,7 @@ namespace Kanye4King
                         worker2.DoWork += async (s, e) =>
                         {
                             //     Checker.AuthApp.login(l, p);
-                            Instance.Dispatcher.Invoke(() =>
-                            {
-                               
-                                start ??= Start();
-                            
-                            });
+                            Instance.Dispatcher.Invoke(() => { start ??= Start(); });
                         };
                         worker2.RunWorkerAsync();
                     }
@@ -120,13 +119,13 @@ namespace Kanye4King
         }
 
         public static Task start;
+
         async Task Start()
         {
             BackgroundWorker worker = new BackgroundWorker();
 
             worker.DoWork += async (s, e) =>
             {
-
                 bool Update()
                 {
                     Instance.Dispatcher.Invoke(() => TaskDescription.Content = "Downloading an update");
@@ -137,13 +136,15 @@ namespace Kanye4King
                             break;
                         }
 
-                        Instance.Dispatcher.Invoke(() => TaskDescription.Content = $"Failed to update, trying again #{i + 1}");
+                        Instance.Dispatcher.Invoke(() =>
+                            TaskDescription.Content = $"Failed to update, trying again #{i + 1}");
                         if (i == 4)
                         {
                             Instance.Dispatcher.Invoke(() => TaskDescription.Content = "Update failed");
                             return false;
                         }
                     }
+
                     return true;
                 }
 
@@ -172,8 +173,10 @@ namespace Kanye4King
                     if (File.Exists("activation.mp3") && !File.Exists("activate.mp3"))
                         File.Move("activation.mp3", "activate.mp3", true);
 
-                    var snd = Directory.CreateDirectory(Path.Combine(Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName), "Sound"));
-                    foreach (var sound in Directory.GetFiles(Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName), "*.mp3"))
+                    var snd = Directory.CreateDirectory(
+                        Path.Combine(Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName), "Sound"));
+                    foreach (var sound in Directory.GetFiles(
+                                 Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName), "*.mp3"))
                     {
                         File.Move(sound, Path.Combine(snd.FullName, Path.GetFileName(sound)), true);
                     }
@@ -244,7 +247,8 @@ namespace Kanye4King
                         ExtraLogger.Error(ex, "Start");
                         Logger.Fatal($"ProgressBar: {ex}");
 
-                        var a = System.Windows.MessageBox.Show($"Startup errored with {ex.GetType()}\nContact developer if issue persists");
+                        var a = System.Windows.MessageBox.Show(
+                            $"Startup errored with {ex.GetType()}\nContact developer if issue persists");
                         Process.GetCurrentProcess().CloseMainWindow();
                         Application.Current.Shutdown();
                     });
@@ -265,7 +269,6 @@ namespace Kanye4King
             var usr = login.Text.Trim();
             var pw = password.Password.Trim();
 
-       
 
             Config.Instance.Username = usr;
             Config.Instance.Password = pw;
@@ -274,7 +277,6 @@ namespace Kanye4King
             {
                 start ??= Start();
             }
-       
         }
 
         private void RegisterClick(object sender, RoutedEventArgs e)
@@ -292,15 +294,13 @@ namespace Kanye4King
             var k = key.Password.Trim();
 
 
-                    Config.Instance.Username = usr;
-                    Config.Instance.Password = pw;
+            Config.Instance.Username = usr;
+            Config.Instance.Password = pw;
 
-                    if (Checker.TimeLeft.TotalSeconds > 0)
-                    {
-                        start ??= Start();
-                    }
-        
-
+            if (Checker.TimeLeft.TotalSeconds > 0)
+            {
+                start ??= Start();
+            }
         }
 
         private void RedeemClick(object sender, RoutedEventArgs e)
@@ -318,7 +318,6 @@ namespace Kanye4King
             {
                 start ??= Start();
             }
-
         }
     }
 }

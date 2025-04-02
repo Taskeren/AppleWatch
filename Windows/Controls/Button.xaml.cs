@@ -1,5 +1,4 @@
 ﻿using Kanye4King.Utility;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +15,6 @@ using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-
 using UserControl = System.Windows.Controls.UserControl;
 
 namespace Kanye4King.Controls
@@ -41,17 +39,19 @@ namespace Kanye4King.Controls
         }
 
         public static readonly DependencyProperty ForegroundProperty =
-            DependencyProperty.Register("Foreground", typeof(SolidColorBrush), typeof(Button), new PropertyMetadata(Brushes.White));
+            DependencyProperty.Register("Foreground", typeof(SolidColorBrush), typeof(Button),
+                new PropertyMetadata(Brushes.White));
 
 
-        new public SolidColorBrush Background 
+        new public SolidColorBrush Background
         {
             get { return (SolidColorBrush)GetValue(BackgroundProperty); }
             set { SetValue(BackgroundProperty, value); }
         }
 
         public static readonly DependencyProperty BackgroundProperty =
-            DependencyProperty.Register("Background", typeof(SolidColorBrush), typeof(Button), new PropertyMetadata(new SolidColorBrush(Color.FromArgb(0x10, 0xFF, 0xFF, 0xFF))));
+            DependencyProperty.Register("Background", typeof(SolidColorBrush), typeof(Button),
+                new PropertyMetadata(new SolidColorBrush(Color.FromArgb(0x10, 0xFF, 0xFF, 0xFF))));
 
 
         public CornerRadius CornerRadius
@@ -61,32 +61,35 @@ namespace Kanye4King.Controls
         }
 
         public static readonly DependencyProperty CornerRadiusProperty =
-            DependencyProperty.Register("CornerRadius", typeof(CornerRadius), typeof(Button), new PropertyMetadata(new CornerRadius { BottomLeft = 9, BottomRight = 9, TopLeft = 9, TopRight = 9}));
-
-
+            DependencyProperty.Register("CornerRadius", typeof(CornerRadius), typeof(Button),
+                new PropertyMetadata(new CornerRadius { BottomLeft = 9, BottomRight = 9, TopLeft = 9, TopRight = 9 }));
 
 
         public Button()
         {
-            if (Background == Brushes.White) Background = System.Windows.Application.Current.Resources["AccentColor"] as SolidColorBrush;
+            if (Background == Brushes.White)
+                Background = System.Windows.Application.Current.Resources["AccentColor"] as SolidColorBrush;
             InitializeComponent();
             DataContext = this;
         }
 
         private void Border_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
         {
-            var lightOn = new DoubleAnimation(ButtonBorder.Opacity, 1.0, TimeSpan.FromSeconds(0.35)) { EasingFunction = new BackEase() { EasingMode = EasingMode.EaseOut } };
+            var lightOn = new DoubleAnimation(ButtonBorder.Opacity, 1.0, TimeSpan.FromSeconds(0.35))
+                { EasingFunction = new BackEase() { EasingMode = EasingMode.EaseOut } };
             ButtonBorder.BeginAnimation(OpacityProperty, lightOn);
         }
 
         private void Border_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
         {
-            var lightOff = new DoubleAnimation(ButtonBorder.Opacity, 0.7, TimeSpan.FromSeconds(0.35)) { EasingFunction = new BackEase() { EasingMode = EasingMode.EaseOut } };
+            var lightOff = new DoubleAnimation(ButtonBorder.Opacity, 0.7, TimeSpan.FromSeconds(0.35))
+                { EasingFunction = new BackEase() { EasingMode = EasingMode.EaseOut } };
             ButtonBorder.BeginAnimation(OpacityProperty, lightOff);
         }
 
 
         public event RoutedEventHandler Click;
+
         private void Border_MouseDown(object sender, MouseButtonEventArgs e)
         {
             if (e.ChangedButton == MouseButton.Left)

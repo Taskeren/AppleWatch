@@ -1,5 +1,4 @@
 ﻿using Kanye4King.Models;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,10 +12,11 @@ namespace Kanye4King.Interception.Modules
     public class ResModule : PacketModuleBase
     {
         PacketProviderBase provider;
+
         public ResModule() : base("Revive", false, InterceptionManager.GetProvider("Players"))
         {
             Description =
-@"Skips revive confirmation
+                @"Skips revive confirmation
 Doesn't take revive token in some activities
 Bind with interaction key
 Disables itself";
@@ -46,7 +46,8 @@ Disables itself";
         CancellationTokenSource cts;
         TimeSpan delay = TimeSpan.FromSeconds(2.5);
         DateTime highest = DateTime.MinValue;
-        HashSet<string> blacklist = new ();
+        HashSet<string> blacklist = new();
+
         public override bool AllowPacket(Packet p)
         {
             if (!base.AllowPacket(p)) return false;
@@ -65,7 +66,7 @@ Disables itself";
                 return true;
             }
 
-            if (p.Outbound) return true;// return !black;
+            if (p.Outbound) return true; // return !black;
 
             if (p.Length >= 1215 && p.Length <= 1225)
             {
@@ -97,6 +98,7 @@ Disables itself";
                     });
                 }
                 else Logger.Debug($"{Name}: Repeat at {r}");
+
                 return false;
             }
 

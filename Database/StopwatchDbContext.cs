@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -24,8 +23,8 @@ namespace Kanye4King.Database
 
         protected override void OnConfiguring(DbContextOptionsBuilder options)
             => options
-            .UseSqlite(_connectionString)
-            .EnableSensitiveDataLogging();
+                .UseSqlite(_connectionString)
+                .EnableSensitiveDataLogging();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

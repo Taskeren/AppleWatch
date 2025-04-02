@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging.Abstractions;
-
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -15,7 +14,6 @@ using System.Timers;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
-
 using static System.Runtime.CompilerServices.RuntimeHelpers;
 
 namespace Kanye4King.Utility
@@ -23,8 +21,10 @@ namespace Kanye4King.Utility
     public class KeyListener : IDisposable
     {
         #region DLL_IMPORT
+
         [DllImport("user32.dll")]
         static extern Int16 GetKeyState(int vKey);
+
         [DllImport("user32.dll")]
         static extern ushort GetAsyncKeyState(int vKey);
 
@@ -39,9 +39,11 @@ namespace Kanye4King.Utility
 
         [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         static extern IntPtr GetModuleHandle(string lpModuleName);
+
         #endregion
 
         #region CONSTANTS
+
         const int WH_KEYBOARD_LL = 13;
         const int WM_SYSKEYDOWN = 0x0104;
         const int WM_SYSKEYUP = 0x0105;
@@ -75,6 +77,7 @@ namespace Kanye4King.Utility
             public uint time;
             public IntPtr dwExtraInfo;
         }
+
         #endregion
 
         struct KeyEvent
@@ -86,8 +89,8 @@ namespace Kanye4King.Utility
         private static Channel<KeyEvent> _eventChannel = Channel.CreateUnbounded<KeyEvent>();
 
 
-
         delegate IntPtr LowLevelInputProc(int nCode, IntPtr wParam, IntPtr lParam);
+
         static IntPtr KeyboardCallback(int nCode, IntPtr wParam, IntPtr lParam)
         {
             if (nCode < 0) return CallNextHookEx(_kbHook, nCode, wParam, lParam);
@@ -101,6 +104,7 @@ namespace Kanye4King.Utility
 
             return CallNextHookEx(_kbHook, nCode, wParam, lParam);
         }
+
         static IntPtr MouseCallback(int nCode, IntPtr wParam, IntPtr lParam)
         {
             if (nCode < 0) return CallNextHookEx(_mouseHook, nCode, wParam, lParam);
@@ -151,8 +155,8 @@ namespace Kanye4King.Utility
         }
 
 
-
         private static CancellationTokenSource _cts = new CancellationTokenSource();
+
         private void StartEventProcessor()
         {
             Task.Run(async () =>
@@ -186,12 +190,15 @@ namespace Kanye4King.Utility
         }
 
         public delegate void KeysPressedEventHandler(LinkedList<Keycode> keycodes);
+
         public static event KeysPressedEventHandler KeysPressed;
-        public static LinkedList<Keycode> CurrentPressed = new ();
+        public static LinkedList<Keycode> CurrentPressed = new();
+
         public KeyListener()
         {
             Hook();
         }
+
         ~KeyListener()
         {
             Dispose();
@@ -202,6 +209,7 @@ namespace Kanye4King.Utility
         static IntPtr _mouseHook = IntPtr.Zero;
         static LowLevelInputProc _kbCallback;
         static LowLevelInputProc _mouseCallback;
+
         private static IntPtr SetHook(LowLevelInputProc proc, IntPtr hookId)
         {
             using (Process curProcess = Process.GetCurrentProcess())
@@ -235,6 +243,7 @@ namespace Kanye4King.Utility
                 StartEventProcessor();
             }
         }
+
         void Unhook()
         {
             if (_kbCallback is not null && _mouseCallback is not null)

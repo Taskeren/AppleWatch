@@ -1,10 +1,8 @@
 ﻿using DotNetBungieAPI.Models.Destiny.Components;
-
 using Kanye4King.Interception.PacketProviders;
 using Kanye4King.Models;
 using Kanye4King.Utility;
 using Kanye4King.Windows;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +11,6 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Media;
-
 using WindivertDotnet;
 
 namespace Kanye4King.Interception.Modules
@@ -21,6 +18,7 @@ namespace Kanye4King.Interception.Modules
     public class PveModule : PacketModuleBase
     {
         PacketProviderBase xbox;
+
         public PveModule() : base("PVE", true, InterceptionManager.GetProvider("Xbox"))
         {
             Icon = System.Windows.Application.Current.FindResource("ArcIcon") as Geometry;
@@ -56,7 +54,7 @@ namespace Kanye4King.Interception.Modules
             base.StopListening();
         }
 
-        
+
         // HANDLERS
         private void OutboundHandler(LinkedList<Keycode> keycodes)
         {
@@ -69,6 +67,7 @@ namespace Kanye4King.Interception.Modules
                 ToggleSwitch(ref Outbound);
             }
         }
+
         private void SlowInboundHandler(LinkedList<Keycode> keycodes)
         {
             if (!KeybindChecks()) return;
@@ -80,6 +79,7 @@ namespace Kanye4King.Interception.Modules
                 ToggleSwitch(ref SlowInbound);
             }
         }
+
         private void SlowOutboundHandler(LinkedList<Keycode> keycodes)
         {
             if (!KeybindChecks()) return;
@@ -91,7 +91,6 @@ namespace Kanye4King.Interception.Modules
                 ToggleSwitch(ref SlowOutbound);
             }
         }
-
 
 
         // SWITCHES
@@ -166,19 +165,21 @@ namespace Kanye4King.Interception.Modules
                     if (Buffer) xbox.DelayPacket(p, TimeSpan.FromSeconds(35));
                     return false;
                 }
+
                 if (SlowInbound)
                 {
                     xbox.DelayPacket(p, TimeSpan.FromSeconds(1), true, true);
                     return false;
                 }
             }
-            else 
+            else
             {
                 if (Outbound)
                 {
                     if (Buffer) xbox.DelayPacket(p, TimeSpan.FromSeconds(35));
                     return false;
                 }
+
                 if (SlowOutbound)
                 {
                     xbox.DelayPacket(p, TimeSpan.FromSeconds(1), true, true);

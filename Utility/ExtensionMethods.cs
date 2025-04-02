@@ -1,6 +1,5 @@
 ﻿using Kanye4King.Database;
 using Kanye4King.Models;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +15,6 @@ using System.Windows.Controls;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
-
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 
 namespace Kanye4King
@@ -25,15 +23,16 @@ namespace Kanye4King
     {
         public static string Serialize(this object obj, bool spaces = false, bool ignore_default = false)
         {
-            return JsonSerializer.Serialize(obj, new JsonSerializerOptions() 
-            { 
-                IncludeFields = true, 
-                WriteIndented = spaces, 
-                DefaultIgnoreCondition = ignore_default 
-                    ? System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault 
+            return JsonSerializer.Serialize(obj, new JsonSerializerOptions()
+            {
+                IncludeFields = true,
+                WriteIndented = spaces,
+                DefaultIgnoreCondition = ignore_default
+                    ? System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault
                     : System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
             });
         }
+
         public static T Deserialize<T>(this string obj)
         {
             return JsonSerializer.Deserialize<T>(obj, new JsonSerializerOptions() { IncludeFields = true });
@@ -43,7 +42,9 @@ namespace Kanye4King
         private static TimeSpan animationTime = TimeSpan.FromSeconds(0.5);
         private static List<UIElement> inAppear = new List<UIElement>();
         private static List<UIElement> inDisappear = new List<UIElement>();
-        public static void ElementDisappear(this UIElement e, TimeSpan timeOverride = default, bool shrink = true, bool checkOverride = false)
+
+        public static void ElementDisappear(this UIElement e, TimeSpan timeOverride = default, bool shrink = true,
+            bool checkOverride = false)
         {
             if (e.Visibility == Visibility.Collapsed) return;
             if (timeOverride == default)
@@ -83,7 +84,9 @@ namespace Kanye4King
 
             return;
         }
-        public static void ElementAppear(this UIElement e, TimeSpan timeOverride = default, bool shrink = true, bool checkOverride = false)
+
+        public static void ElementAppear(this UIElement e, TimeSpan timeOverride = default, bool shrink = true,
+            bool checkOverride = false)
         {
             if (e.Visibility == Visibility.Visible) return;
             if (timeOverride == default)
@@ -116,7 +119,7 @@ namespace Kanye4King
                 DoubleAnimation anim = new DoubleAnimation(0, 1, timeOverride);
                 trans.BeginAnimation(ScaleTransform.ScaleXProperty, anim);
                 trans.BeginAnimation(ScaleTransform.ScaleYProperty, anim);
-            } 
+            }
 
             return;
         }
@@ -140,6 +143,7 @@ namespace Kanye4King
             };
             e.BeginAnimation(UIElement.OpacityProperty, disappear);
         }
+
         public static void ElementFadeIn(this UIElement e, TimeSpan timeOverride = default, bool checkOverride = false)
         {
             if (e.Visibility == Visibility.Visible && e.Opacity != 0) return;
@@ -183,6 +187,7 @@ namespace Kanye4King
 
             return result.ToArray();
         }
+
         public static string BytesLenghtToString(this int len)
         {
             if (len >= 1048576 / 2) // 0.5 MB
@@ -204,12 +209,13 @@ namespace Kanye4King
         {
             return string.Join("", bytes.Select(x => x.ToString("x2")));
         }
+
         public static byte[] ToBytes(this string bytes)
         {
             return Enumerable.Range(0, bytes.Length)
-                                 .Where(x => x % 2 == 0)
-                                 .Select(x => Convert.ToByte(bytes.Substring(x, 2), 16))
-                                 .ToArray();
+                .Where(x => x % 2 == 0)
+                .Select(x => Convert.ToByte(bytes.Substring(x, 2), 16))
+                .ToArray();
         }
 
 
@@ -229,17 +235,17 @@ namespace Kanye4King
                     continue;
                 }
             }
+
             return String.Empty;
         }
-
 
 
         static public Color ColorFromHSL(float h, float s, float v)
         {
             if (s == 0)
-            { 
-                byte L = (byte)v; 
-                return Color.FromArgb(255, L, L, L); 
+            {
+                byte L = (byte)v;
+                return Color.FromArgb(255, L, L, L);
             }
 
             double min, max, hh;
@@ -249,8 +255,8 @@ namespace Kanye4King
             min = (v * 2d) - max;
 
             Color c = Color.FromArgb(255, (byte)(255 * RGBChannelFromHue(min, max, hh + 1 / 3d)),
-                                          (byte)(255 * RGBChannelFromHue(min, max, hh)),
-                                          (byte)(255 * RGBChannelFromHue(min, max, hh - 1 / 3d)));
+                (byte)(255 * RGBChannelFromHue(min, max, hh)),
+                (byte)(255 * RGBChannelFromHue(min, max, hh - 1 / 3d)));
             return c;
         }
 
@@ -262,7 +268,6 @@ namespace Kanye4King
             else if (h * 2 < 1) return m2;
             else if (h * 3 < 2) return m1 + (m2 - m1) * 6 * (2d / 3d - h);
             else return m1;
-
         }
     }
 }

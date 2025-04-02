@@ -15,6 +15,7 @@ namespace Kanye4King.Controls
             get { return (string)GetValue(TextProperty); }
             set { SetValue(TextProperty, value); }
         }
+
         public static readonly DependencyProperty TextProperty =
             DependencyProperty.Register("Text", typeof(string), typeof(FilterCheckbox), new PropertyMetadata(""));
 
@@ -23,6 +24,7 @@ namespace Kanye4King.Controls
             get { return (Geometry)GetValue(GeometryProperty); }
             set { SetValue(GeometryProperty, value); }
         }
+
         public static readonly DependencyProperty GeometryProperty =
             DependencyProperty.Register("Geometry", typeof(Geometry), typeof(WindowControlButton),
                 new PropertyMetadata(Geometry.Parse("M 0 0")));
@@ -32,18 +34,21 @@ namespace Kanye4King.Controls
             get { return (Brush)GetValue(ColorProperty); }
             set { SetValue(ColorProperty, value); }
         }
-        public static readonly DependencyProperty ColorProperty =
-            DependencyProperty.Register("Color", typeof(Brush), typeof(FilterCheckbox), new PropertyMetadata(Brushes.White));
 
-        
+        public static readonly DependencyProperty ColorProperty =
+            DependencyProperty.Register("Color", typeof(Brush), typeof(FilterCheckbox),
+                new PropertyMetadata(Brushes.White));
+
+
         public CornerRadius CornerRadius
         {
             get { return (CornerRadius)GetValue(CornerRadiusProperty); }
             set { SetValue(CornerRadiusProperty, value); }
         }
-        public static readonly DependencyProperty CornerRadiusProperty = 
-            DependencyProperty.Register("CornerRadius", typeof(CornerRadius), typeof(FilterCheckbox), new PropertyMetadata(new CornerRadius(11)));
 
+        public static readonly DependencyProperty CornerRadiusProperty =
+            DependencyProperty.Register("CornerRadius", typeof(CornerRadius), typeof(FilterCheckbox),
+                new PropertyMetadata(new CornerRadius(11)));
 
 
         public bool Checked
@@ -56,8 +61,8 @@ namespace Kanye4King.Controls
             DependencyProperty.Register("Checked", typeof(bool), typeof(FilterCheckbox), new PropertyMetadata(false));
 
 
-
         public double AnimationTime = 0.3;
+
         public FilterCheckbox()
         {
             InitializeComponent();
@@ -70,7 +75,7 @@ namespace Kanye4King.Controls
             Border.CornerRadius = CornerRadius;
 
             Label.Content = Text;
-            
+
             Icon.Data = Geometry;
             Icon.Fill = Color;
             Icon.StrokeThickness = 5;
@@ -85,10 +90,12 @@ namespace Kanye4King.Controls
         public event RoutedEventHandler CheckboxChecked;
         DateTime latestTrigger = DateTime.MinValue;
         double brightness = 0.35;
+
         SolidColorBrush tinted => new SolidColorBrush(System.Windows.Media.Color.FromArgb(0x77,
             (byte)((Color as SolidColorBrush).Color.R * brightness),
             (byte)((Color as SolidColorBrush).Color.G * brightness),
             (byte)((Color as SolidColorBrush).Color.B * brightness)));
+
         private void Border_MouseDown(object sender, MouseButtonEventArgs e)
         {
             if (e.ChangedButton == MouseButton.Left && DateTime.Now - latestTrigger > TimeSpan.FromSeconds(0.5))
@@ -101,10 +108,13 @@ namespace Kanye4King.Controls
 
                 // #7718122B
                 var cur = (Color as SolidColorBrush).Color;
-                var finishBackgroundColor = Checked ? new SolidColorBrush(System.Windows.Media.Color.FromArgb(0x77, cur.R, cur.G, cur.B)) : tinted;
+                var finishBackgroundColor = Checked
+                    ? new SolidColorBrush(System.Windows.Media.Color.FromArgb(0x77, cur.R, cur.G, cur.B))
+                    : tinted;
                 //var finishTextColor = Checked ? new SolidColorBrush(System.Windows.Media.Color.FromArgb(0xff, 0x00, 0x00, 0x00)) : new SolidColorBrush((Color as SolidColorBrush).Color);
 
-                var colorAnim = new ColorAnimation((border.Background as SolidColorBrush).Color, finishBackgroundColor.Color, TimeSpan.FromSeconds(AnimationTime));
+                var colorAnim = new ColorAnimation((border.Background as SolidColorBrush).Color,
+                    finishBackgroundColor.Color, TimeSpan.FromSeconds(AnimationTime));
                 //var textAnim = new ColorAnimation((label.Foreground as SolidColorBrush).Color, finishTextColor.Color, TimeSpan.FromSeconds(AnimationTime));
 
                 var currentBackgroundColor = new SolidColorBrush((border.Background as SolidColorBrush).Color);
@@ -129,13 +139,15 @@ namespace Kanye4King.Controls
             {
                 var cur = new SolidColorBrush((Color as SolidColorBrush).Color);
                 Border.Background = cur;
-                Border.Background = Checked ? new SolidColorBrush(System.Windows.Media.Color.FromArgb(0x77, cur.Color.R, cur.Color.G, cur.Color.B)) : tinted;
+                Border.Background = Checked
+                    ? new SolidColorBrush(
+                        System.Windows.Media.Color.FromArgb(0x77, cur.Color.R, cur.Color.G, cur.Color.B))
+                    : tinted;
                 //Icon.Fill = Color;
                 //Label.Foreground = Checked ? new SolidColorBrush(System.Windows.Media.Color.FromArgb(0xff, 0x00, 0x00, 0x00)) : new SolidColorBrush(cur.Color);
                 Label.FontWeight = Checked ? FontWeights.Bold : FontWeights.Normal;
             }));
         }
-
 
 
         private void Border_MouseEnter(object sender, MouseEventArgs e)
@@ -146,8 +158,8 @@ namespace Kanye4King.Controls
                 var anim = new DoubleAnimation(border.Opacity, 0.95, TimeSpan.FromSeconds(AnimationTime));
                 border.BeginAnimation(OpacityProperty, anim);
             }));
-
         }
+
         private void Border_MouseLeave(object sender, MouseEventArgs e)
         {
             Dispatcher.BeginInvoke(new Action(() =>

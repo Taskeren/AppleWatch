@@ -1,6 +1,5 @@
-﻿ using Kanye4King.Controls;
+﻿using Kanye4King.Controls;
 using Kanye4King.Utility;
-
 using System;
 using System.Collections.Generic;
 using System.Data.SqlTypes;
@@ -17,8 +16,6 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-
-
 using Application = System.Windows.Application;
 
 namespace Kanye4King
@@ -26,6 +23,7 @@ namespace Kanye4King
     public partial class ServiceWindow : Window
     {
         bool loaded = false;
+
         public ServiceWindow()
         {
             Visibility = Visibility.Collapsed;
@@ -81,8 +79,11 @@ namespace Kanye4King
             OverlayX.Text = Config.Instance.Settings.Overlay_LeftOffset.ToString();
             OverlayY.Text = Config.Instance.Settings.Overlay_BottomOffset.ToString();
             BungieName.Text = Config.Instance.Settings.Tracker_BungieName ?? "Name#0000";
-            BungieName.Foreground = Application.Current.Resources[Config.Instance.Settings.Tracker_BungieName is not null ? "AccentColor" : "InactiveColor"] as SolidColorBrush;
-            
+            BungieName.Foreground =
+                Application.Current.Resources[
+                        Config.Instance.Settings.Tracker_BungieName is not null ? "AccentColor" : "InactiveColor"] as
+                    SolidColorBrush;
+
             Visibility = Visibility.Visible;
             loaded = true;
         }
@@ -144,8 +145,6 @@ namespace Kanye4King
         }
 
 
-
-
         private void KB_Log_Click(object sender, RoutedEventArgs e)
         {
             Config.Instance.Settings.DB_KeyPresses = KB_Log.Checked;
@@ -183,7 +182,7 @@ namespace Kanye4King
         {
             if (!loaded) return;
             if (int.TryParse(OverlayX.Text.Trim(), out var px))
-            { 
+            {
                 Config.Instance.Settings.Overlay_LeftOffset = px;
                 OverlayX.Text = Config.Instance.Settings.Overlay_LeftOffset.ToString();
                 Config.Save();
@@ -232,6 +231,7 @@ namespace Kanye4King
                 }
             }
         }
+
         private void ServiceWindow_MouseDown(object sender, MouseButtonEventArgs e)
         {
             if (!BungieName.IsEnabled) return;
@@ -264,7 +264,8 @@ namespace Kanye4King
         {
             if (FindButton is null || BungieName is null) return;
 
-            if (string.IsNullOrEmpty(BungieName.Text) || BungieName.Text == (Config.Instance.Settings.Tracker_BungieName ?? "Name#0000"))
+            if (string.IsNullOrEmpty(BungieName.Text) ||
+                BungieName.Text == (Config.Instance.Settings.Tracker_BungieName ?? "Name#0000"))
             {
                 FindButton.ElementDisappear();
                 return;
@@ -303,7 +304,7 @@ namespace Kanye4King
                 {
                     Logger.Error(e);
                 }
-                 
+
                 Dispatcher.Invoke(() =>
                 {
                     FindButton.Text = "Find";
@@ -319,6 +320,7 @@ namespace Kanye4King
                         BungieName.Text = "Name#0000";
                         BungieName.Foreground = Application.Current.Resources["InactiveColor"] as SolidColorBrush;
                     }
+
                     BungieName.IsEnabled = FindButton.IsEnabled = true;
                 });
             });
@@ -353,6 +355,7 @@ namespace Kanye4King
             Config.Instance.Settings.Overlay_ShowTime = ShowTime.Checked;
             Config.Save();
         }
+
         private void OverlayTimer_Click(object sender, RoutedEventArgs e)
         {
             Config.Instance.Settings.Overlay_ShowTimer = ShowTimer.Checked;
@@ -366,7 +369,7 @@ namespace Kanye4King
         }
 
         // TODO: FIND HOW TO BIND CHECKBOXES
-        
+
         private void KeysSuppress_Click(object sender, RoutedEventArgs e)
         {
             Config.Instance.Settings.AltTabSupressKeybinds = KeybindsSuppress.Checked;

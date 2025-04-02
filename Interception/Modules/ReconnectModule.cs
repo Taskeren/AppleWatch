@@ -1,8 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-
 using Kanye4King.Database;
 using Kanye4King.Models;
-
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -14,7 +12,6 @@ using System.Threading.Tasks;
 using System.Windows.Documents;
 using System.Windows.Forms;
 using System.Windows.Media;
-
 using WindivertDotnet;
 
 namespace Kanye4King.Interception.Modules
@@ -22,12 +19,13 @@ namespace Kanye4King.Interception.Modules
     public class ReconnectModule : PacketModuleBase
     {
         PacketProviderBase _30k;
+
         public ReconnectModule() : base("Reconnect", false, InterceptionManager.GetProvider("30000"))
         {
             IsActivated = false;
             Icon = System.Windows.Application.Current.FindResource("ReconnectIcon") as Geometry ?? Icon;
             Description =
-@"Instant reconnect
+                @"Instant reconnect
 Change public instances
 Reload world state
 Pull yourself to team leader";
@@ -44,15 +42,14 @@ Pull yourself to team leader";
             {
                 try
                 {
-                    if (_30k.Connections.TryGetValue(addr, out var q) && q is not null && DateTime.Now - q.LastOrDefault()?.CreatedAt < TimeSpan.FromSeconds(10))
+                    if (_30k.Connections.TryGetValue(addr, out var q) && q is not null &&
+                        DateTime.Now - q.LastOrDefault()?.CreatedAt < TimeSpan.FromSeconds(10))
                         Inject(addr);
-
                 }
                 catch (Exception e)
                 {
                     Logger.Error(e);
                 }
-                
             }
 
             Task.Run(async () =>
@@ -101,6 +98,7 @@ Pull yourself to team leader";
             #endregion
 
             #region rst
+
             // both // solo // fireteam 8 sec
             // outbound rst // solo sec // fireteam 10 sec
             var p1 = out_example.BuildSameDirection();
@@ -115,6 +113,7 @@ Pull yourself to team leader";
             p2.Recalc();
             _30k.StorePacket(p2);
             _30k.SendPacket(p2, true);
+
             #endregion
 
             #region syn
@@ -139,6 +138,7 @@ Pull yourself to team leader";
             //p1.ParseResult.TcpHeader->SeqNum = 63969235;
             //_30k.StorePacket(p1);
             //_30k.SendPacket(p1, true);
+
             #endregion
         }
     }

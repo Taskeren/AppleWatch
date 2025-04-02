@@ -3,7 +3,6 @@ using Kanye4King.Interception;
 using Kanye4King.Interception.Modules;
 using Kanye4King.Interception.PacketProviders;
 using Kanye4King.Utility;
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -23,9 +22,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Threading;
-
 using static System.Net.Mime.MediaTypeNames;
-
 using Path = System.Windows.Shapes.Path;
 
 namespace Kanye4King.Windows
@@ -34,8 +31,10 @@ namespace Kanye4King.Windows
     {
         [DllImport("user32.dll")]
         static extern IntPtr GetForegroundWindow();
+
         [DllImport("user32.dll")]
         public static extern bool GetWindowRect(IntPtr hwnd, out RECT lpRect);
+
         [StructLayout(LayoutKind.Sequential)]
         public struct RECT
         {
@@ -44,6 +43,7 @@ namespace Kanye4King.Windows
             public int Right;
             public int Bottom;
         }
+
         protected override void OnSourceInitialized(EventArgs e)
         {
             base.OnSourceInitialized(e);
@@ -64,11 +64,11 @@ namespace Kanye4King.Windows
         }
 
 
-
         DispatcherTimer timer;
         PacketModuleBase m;
         XboxProvider provider;
         TimeSpan delta = TimeSpan.FromSeconds(0.5);
+
         public OverlayWindow()
         {
             InitializeComponent();
@@ -89,6 +89,7 @@ namespace Kanye4King.Windows
                 timer.Interval = TimeSpan.FromSeconds(1);
                 return;
             }
+
             // 1 3/3, 2 2/3
             if (Config.Instance.Settings.Overlay_DisableOnInactivity)
             {
@@ -113,11 +114,11 @@ namespace Kanye4King.Windows
         }
 
 
-
         static Process cachedProcess;
         const string targetProcessName = "destiny2";
         static bool LastGameFocusResult = false;
         static DateTime lastCheckTime = DateTime.MinValue;
+
         public static bool CheckGameFocus(bool skipCheck = false)
         {
             if (!skipCheck && DateTime.Now - lastCheckTime < TimeSpan.FromSeconds(1))
@@ -160,7 +161,7 @@ namespace Kanye4King.Windows
                 double win_h = rect.Bottom - rect.Top;
                 double win_w = rect.Right - rect.Left;
                 var ratio = win_w / win_h;
-                
+
                 double x_multiplier = win_w / w_base;
                 double y_multiplier = win_h / h_base;
 
@@ -170,14 +171,16 @@ namespace Kanye4King.Windows
                 // widescreen
                 if (ratio > ratio_base) xoffset += (win_w - win_h * ratio_base) / 2;
                 if (ratio < ratio_base) yoffset += (win_h - win_w / ratio_base) / 2;
-                
+
                 // 345 200
                 Width = (win_w - xoffset * 2) / 4;
                 Height = (win_h - yoffset * 2) / 4;
                 //Logger.Debug($"{win_w}/{win_h} -> {Width}:{Height}, xoff-{xoffset}, yoff-{yoffset}");
 
-                Left = rect.Left + xoffset + 118 * (win_w - xoffset * 2) / w_base + Config.Instance.Settings.Overlay_LeftOffset;
-                Top = rect.Top + yoffset + ((win_h - yoffset * 2) * 3 / 4) - Config.Instance.Settings.Overlay_BottomOffset;
+                Left = rect.Left + xoffset + 118 * (win_w - xoffset * 2) / w_base +
+                       Config.Instance.Settings.Overlay_LeftOffset;
+                Top = rect.Top + yoffset + ((win_h - yoffset * 2) * 3 / 4) -
+                      Config.Instance.Settings.Overlay_BottomOffset;
 
                 Scale.ScaleX = (win_w - xoffset * 2) / w_base;
                 Scale.ScaleY = (win_h - yoffset * 2) / h_base;
@@ -194,12 +197,13 @@ namespace Kanye4King.Windows
                 //Height = 200d * y_multiplier * 2;
                 return true;
             }
+
             return false;
         }
 
 
-
         Dictionary<PacketModuleBase, EnabledModuleTimer> modules = new();
+
         private void CheckModules()
         {
             foreach (var m in InterceptionManager.Modules)
@@ -261,6 +265,7 @@ namespace Kanye4King.Windows
                 }
             }
         }
+
         private void CheckInstanceTimer()
         {
             if (D2CharacterTracker.RaidsCount > 0)
@@ -279,7 +284,7 @@ namespace Kanye4King.Windows
                 Timer.Content = DateTime.Now.ToString("hh':'mm':'ss");
                 Timer.ElementFadeIn();
             }
-            else 
+            else
             {
                 if (!provider.IsEnabled || !Config.Instance.Settings.Overlay_ShowTimer)
                 {
@@ -297,7 +302,8 @@ namespace Kanye4King.Windows
                 Timer.Content = duration.ToString("hh':'mm':'ss");
                 Timer.ElementFadeIn();
 
-                if (duration > TimeSpan.FromSeconds(30) && (Timer.Opacity < 0.5 || Timer.Visibility != Visibility.Visible))
+                if (duration > TimeSpan.FromSeconds(30) &&
+                    (Timer.Opacity < 0.5 || Timer.Visibility != Visibility.Visible))
                 {
                     Timer.Opacity = 1;
                     Timer.Visibility = Visibility.Visible;

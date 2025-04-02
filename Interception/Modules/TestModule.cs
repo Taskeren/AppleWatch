@@ -1,5 +1,4 @@
 ﻿using Kanye4King.Models;
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -17,6 +16,7 @@ namespace Kanye4King.Interception.Modules
     {
         PacketProviderBase players; // InterceptionManager.GetProvider("Players"),
         PacketProviderBase api;
+
         public TestModule() : base("Test", true, InterceptionManager.GetProvider("7500"))
         {
             players = InterceptionManager.GetProvider("Players");
@@ -40,12 +40,6 @@ namespace Kanye4King.Interception.Modules
 
             return false;
         }
-
-
-
-
-
-
 
 
         //public override void Toggle()

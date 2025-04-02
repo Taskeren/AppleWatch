@@ -37,11 +37,9 @@ namespace Kanye4King.Models
         [StructLayout(LayoutKind.Explicit)]
         public struct SYSTEM_CODEINTEGRITY_INFORMATION
         {
-            [FieldOffset(0)]
-            public ulong Length;
+            [FieldOffset(0)] public ulong Length;
 
-            [FieldOffset(4)]
-            public uint CodeIntegrityOptions;
+            [FieldOffset(4)] public uint CodeIntegrityOptions;
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -58,11 +56,9 @@ namespace Kanye4King.Models
         [StructLayout(LayoutKind.Sequential)]
         public struct SYSTEM_KERNEL_DEBUGGER_INFORMATION
         {
-            [MarshalAs(UnmanagedType.U1)]
-            public bool KernelDebuggerEnabled;
+            [MarshalAs(UnmanagedType.U1)] public bool KernelDebuggerEnabled;
 
-            [MarshalAs(UnmanagedType.U1)]
-            public bool KernelDebuggerNotPresent;
+            [MarshalAs(UnmanagedType.U1)] public bool KernelDebuggerNotPresent;
         }
 
         [StructLayout(LayoutKind.Sequential)]

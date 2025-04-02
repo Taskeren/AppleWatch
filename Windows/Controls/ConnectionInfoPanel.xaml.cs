@@ -1,5 +1,4 @@
 ﻿using Kanye4King.Interception;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +13,7 @@ namespace Kanye4King.Controls
     public partial class ConnectionInfoPanel : UserControl
     {
         DispatcherTimer loop;
+
         public ConnectionInfoPanel()
         {
             InitializeComponent();
@@ -37,6 +37,7 @@ namespace Kanye4King.Controls
         }
 
         Dictionary<PacketProviderBase, (Border border, Label dl, Label ul)> providers = new();
+
         private void Loop_Tick(object? sender, EventArgs ev)
         {
             foreach (var p in providers)
@@ -61,7 +62,8 @@ namespace Kanye4King.Controls
                         else
                         {
                             border.ElementDisappear();
-                            if (providers.Count(x => x.Value.border.Visibility != System.Windows.Visibility.Collapsed) == 1) 
+                            if (providers.Count(x =>
+                                    x.Value.border.Visibility != System.Windows.Visibility.Collapsed) == 1)
                             {
                                 Top.ElementDisappear();
                             }

@@ -26,8 +26,6 @@ namespace Kanye4King.Controls
             dispatcherTimer.Tick += new EventHandler(Tick);
             dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
             dispatcherTimer.Start();
-
-            
         }
 
         private void OnLoad(object sender, RoutedEventArgs e)
@@ -39,8 +37,10 @@ namespace Kanye4King.Controls
                 var newDigitLabel = FindName($"time0{j}") as Label;
                 newDigitLabel.Opacity = 0;
                 newDigitLabel.Content = "7";
-                curDigitLabel.MaxWidth = curDigitLabel.MinWidth = newDigitLabel.MaxWidth = newDigitLabel.MinWidth = newDigitLabel.ActualWidth;
-                curDigitLabel.HorizontalContentAlignment = newDigitLabel.HorizontalContentAlignment = curDigitLabel.HorizontalAlignment = newDigitLabel.HorizontalAlignment = HorizontalAlignment.Center;
+                curDigitLabel.MaxWidth = curDigitLabel.MinWidth =
+                    newDigitLabel.MaxWidth = newDigitLabel.MinWidth = newDigitLabel.ActualWidth;
+                curDigitLabel.HorizontalContentAlignment = newDigitLabel.HorizontalContentAlignment =
+                    curDigitLabel.HorizontalAlignment = newDigitLabel.HorizontalAlignment = HorizontalAlignment.Center;
                 curDigitLabel.Content = newDigitLabel.Content = current[j].ToString();
                 curDigitLabel.RenderTransform = new TranslateTransform();
                 newDigitLabel.RenderTransform = new TranslateTransform();
@@ -63,11 +63,18 @@ namespace Kanye4King.Controls
                 {
                     IEasingFunction easeInOut = new BackEase() { EasingMode = EasingMode.EaseInOut };
                     IEasingFunction easeOut = new BackEase() { EasingMode = EasingMode.EaseOut };
-                    DoubleAnimation appearMove = new DoubleAnimation(0, newDigitLabel.ActualHeight, TimeSpan.FromSeconds(animationTime - 0.1)) { EasingFunction = easeInOut };
-                    DoubleAnimation disappearMove = new DoubleAnimation(curDigitLabel.RenderTransform.Value.OffsetY, newDigitLabel.ActualHeight, TimeSpan.FromSeconds(animationTime)) { EasingFunction = easeOut };
+                    DoubleAnimation appearMove =
+                        new DoubleAnimation(0, newDigitLabel.ActualHeight, TimeSpan.FromSeconds(animationTime - 0.1))
+                            { EasingFunction = easeInOut };
+                    DoubleAnimation disappearMove = new DoubleAnimation(curDigitLabel.RenderTransform.Value.OffsetY,
+                        newDigitLabel.ActualHeight, TimeSpan.FromSeconds(animationTime)) { EasingFunction = easeOut };
 
-                    DoubleAnimation appear = new DoubleAnimation(0, 1, new Duration(TimeSpan.FromSeconds(animationTime - 0.1))) { EasingFunction = easeInOut };
-                    DoubleAnimation disappear = new DoubleAnimation(1, 0, new Duration(TimeSpan.FromSeconds(animationTime))) { EasingFunction = easeOut };
+                    DoubleAnimation appear =
+                        new DoubleAnimation(0, 1, new Duration(TimeSpan.FromSeconds(animationTime - 0.1)))
+                            { EasingFunction = easeInOut };
+                    DoubleAnimation disappear =
+                        new DoubleAnimation(1, 0, new Duration(TimeSpan.FromSeconds(animationTime)))
+                            { EasingFunction = easeOut };
 
                     Dispatcher.BeginInvoke(async () =>
                     {
@@ -81,7 +88,7 @@ namespace Kanye4King.Controls
 
                         curDigitLabel.RenderTransform.BeginAnimation(TranslateTransform.YProperty, disappearMove);
                         curDigitLabel.BeginAnimation(OpacityProperty, disappear);
-                        
+
                         await Task.Delay(TimeSpan.FromSeconds(animationTime));
                         curDigitLabel.Content = curDigit.ToString();
                         curDigitLabel.RenderTransform = new TranslateTransform();

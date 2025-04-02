@@ -1,6 +1,5 @@
 ﻿using Kanye4King.Models;
 using Kanye4King.Utility;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,12 +13,13 @@ namespace Kanye4King.Interception.Modules
     public class PvpModule : PacketModuleBase
     {
         PacketProviderBase players;
+
         public PvpModule() : base("PVP", true, InterceptionManager.GetProvider("Players"))
         {
             players = PacketProviders.First();
             Icon = System.Windows.Application.Current.FindResource("MeleeIcon") as Geometry;
             Description =
-@"Block players updates [27K]
+                @"Block players updates [27K]
 Can cause error code if used for too long";
 
             KeyListener.KeysPressed += OutboundHandler;
@@ -38,6 +38,7 @@ Can cause error code if used for too long";
                 IsActivated = true;
             }
         }
+
         public override void StopListening()
         {
             IsActivated = false;
@@ -53,6 +54,7 @@ Can cause error code if used for too long";
         public static bool Outbound = false;
         public static bool AutoResync;
         public static bool Buffer;
+
         public void ToggleSwitch(ref bool target, bool? enable = null)
         {
             var currentIn = Inbound;
@@ -74,20 +76,25 @@ Can cause error code if used for too long";
                     {
                         try
                         {
-                            foreach (var addr in players.Connections.Where(x => x.Value.Any() && DateTime.Now - x.Value.Last().CreatedAt < TimeSpan.FromSeconds(5))
-                                                                    .Select(x => x.Key).Distinct().ToArray())
+                            foreach (var addr in players.Connections.Where(x =>
+                                             x.Value.Any() && DateTime.Now - x.Value.Last().CreatedAt <
+                                             TimeSpan.FromSeconds(5))
+                                         .Select(x => x.Key).Distinct().ToArray())
                             {
                                 players.ClearDelayQueue(addr, true, 10);
                             }
                         }
-                        catch { }
+                        catch
+                        {
+                        }
                     }
+
                     players.ClearDelayQueue();
 
                     IsActivated = false;
                     StartTime = DateTime.Now;
                 }
-                 
+
 
                 var save = target;
                 MainWindow.Instance.Dispatcher.BeginInvoke(() =>
@@ -101,6 +108,7 @@ Can cause error code if used for too long";
 
 
         public static List<Keycode> OutboundKeybind = new List<Keycode>();
+
         private void OutboundHandler(LinkedList<Keycode> keycodes)
         {
             if (!KeybindChecks()) return;
@@ -115,6 +123,7 @@ Can cause error code if used for too long";
 
 
         Dictionary<string, DateTime> breatheConnections = new();
+
         void DisableBreathe(string key)
         {
             var time = breatheConnections[key];
@@ -173,7 +182,6 @@ Can cause error code if used for too long";
 
                 return true;
             }
-
 
 
             var result = false;

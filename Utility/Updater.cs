@@ -2,7 +2,6 @@
 using SharpCompress.Archives.Zip;
 using SharpCompress.Readers;
 using SharpCompress.Readers.Zip;
-
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -13,7 +12,6 @@ using System.Reflection;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using System.Windows.Input;
-
 using ZipArchive = SharpCompress.Archives.Zip.ZipArchive;
 
 namespace Kanye4King.Utility
@@ -22,7 +20,10 @@ namespace Kanye4King.Utility
     {
         public const int Version = 35;
         public const string VersionString = "1.13.10";
-        private const string ManifestUrl = "https://gist.githubusercontent.com/f1Lthz4/3082b26d4dd420e9e8bf00bdbd36cb9c/raw/";
+
+        private const string ManifestUrl =
+            "https://gist.githubusercontent.com/f1Lthz4/3082b26d4dd420e9e8bf00bdbd36cb9c/raw/";
+
         private static Manifest manifest;
 
         public static bool IsLatest()
@@ -55,7 +56,8 @@ namespace Kanye4King.Utility
             IsLatest();
             if (manifest is null)
                 return true;
-            return MD5.HashData(File.ReadAllBytes(Process.GetCurrentProcess().MainModule.FileName)).ToHexString() != manifest.MD5;
+            return MD5.HashData(File.ReadAllBytes(Process.GetCurrentProcess().MainModule.FileName)).ToHexString() !=
+                   manifest.MD5;
         }
 
         public static bool Update()
@@ -74,7 +76,8 @@ namespace Kanye4King.Utility
             {
                 using var fs = File.OpenRead(name);
                 using var zip = ZipArchive.Open(fs, new ReaderOptions() { Password = "1234" });
-                zip.WriteToDirectory(dir, new SharpCompress.Common.ExtractionOptions() { Overwrite = true, ExtractFullPath = true });
+                zip.WriteToDirectory(dir,
+                    new SharpCompress.Common.ExtractionOptions() { Overwrite = true, ExtractFullPath = true });
             }
 
             RunPatcher("update");

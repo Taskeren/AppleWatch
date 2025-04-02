@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
 using WindivertDotnet;
 
 namespace Kanye4King.Interception.PacketProviders
@@ -38,7 +37,10 @@ namespace Kanye4King.Interception.PacketProviders
 
         protected override WinDivert CreateInstance()
         {
-            return Divert = new WinDivert(Filter.True.And(x => x.IsTcp && x.Network.RemotePort >= 7500 && x.Network.RemotePort <= 7509), WinDivertLayer.Network);
+            return Divert =
+                new WinDivert(
+                    Filter.True.And(x => x.IsTcp && x.Network.RemotePort >= 7500 && x.Network.RemotePort <= 7509),
+                    WinDivertLayer.Network);
         }
     }
 }

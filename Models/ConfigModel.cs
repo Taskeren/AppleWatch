@@ -1,5 +1,4 @@
 ﻿using Kanye4King.Utility;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,7 +16,10 @@ namespace Kanye4King.Models
         public string Password { get; set; }
 
         public Settings Settings { get; set; } = new Settings();
-        public Dictionary<string, ModuleSettingsBase> Modules { get; set; } = new Dictionary<string, ModuleSettingsBase>();
+
+        public Dictionary<string, ModuleSettingsBase> Modules { get; set; } =
+            new Dictionary<string, ModuleSettingsBase>();
+
         public List<string> LastOpenAhks { get; set; } = new List<string>();
     }
 

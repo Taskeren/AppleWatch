@@ -11,7 +11,6 @@ namespace WpfSnowfall;
 
 public class Snowfall : Canvas
 {
-
     private readonly Random _random = new();
     public DispatcherTimer? _timer;
 
@@ -50,7 +49,7 @@ public class Snowfall : Canvas
     /// </summary>
     public static readonly DependencyProperty LeaveAnimationProperty = DependencyProperty.Register(
         nameof(LeaveAnimation), typeof(SnowflakeAnimation), typeof(Snowfall), new(SnowflakeAnimation.None));
-    
+
 
     /// <summary>
     /// Scale in/out snowflakes. Higher values generates bigger snowflakes.
@@ -170,7 +169,8 @@ public class Snowfall : Canvas
         var rotateAnimation = GenerateAnimation(rotateAmount, duration, flake, "RenderTransform.Children[0].Angle");
 
         //Create fade animations
-        var fadeOutAnimation = GenerateAnimation(.0, fadeDuration, flake, "Opacity", duration.Subtract(fadeDuration).TimeSpan);
+        var fadeOutAnimation =
+            GenerateAnimation(.0, fadeDuration, flake, "Opacity", duration.Subtract(fadeDuration).TimeSpan);
 
 
         //Start animation
@@ -178,16 +178,16 @@ public class Snowfall : Canvas
         story.Children.Add(xAnimation);
         story.Children.Add(yAnimation);
         story.Children.Add(rotateAnimation);
-        
+
         if (LeaveAnimation == SnowflakeAnimation.Fade)
             story.Children.Add(fadeOutAnimation);
 
         flake.Loaded += (sender, args) => story.Begin();
         story.Completed += (sender, e) => Children.Remove(flake);
-
     }
 
-    private static DoubleAnimation GenerateAnimation(double x, Duration duration, UserControl flake, string propertyPath, TimeSpan? beginTime = null)
+    private static DoubleAnimation GenerateAnimation(double x, Duration duration, UserControl flake,
+        string propertyPath, TimeSpan? beginTime = null)
     {
         DoubleAnimation animation = new()
         {

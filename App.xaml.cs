@@ -1,5 +1,4 @@
 ﻿using Hardcodet.Wpf.TaskbarNotification.Interop;
-
 using System;
 using System.Diagnostics;
 using System.Drawing;
@@ -14,9 +13,7 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
-
 using WpfSnowfall;
-
 using Rectangle = System.Drawing.Rectangle;
 
 namespace Kanye4King
@@ -35,12 +32,14 @@ namespace Kanye4King
             public IntPtr Data;
             public int SizeOfData;
         }
+
         internal enum WindowCompositionAttribute
         {
             // ...
             WCA_ACCENT_POLICY = 19
             // ...
         }
+
         internal enum AccentState
         {
             ACCENT_DISABLED = 0,
@@ -50,6 +49,7 @@ namespace Kanye4King
             ACCENT_ENABLE_ACRYLICBLURBEHIND = 4,
             ACCENT_INVALID_STATE = 5
         }
+
         [StructLayout(LayoutKind.Sequential)]
         internal struct AccentPolicy
         {
@@ -59,7 +59,7 @@ namespace Kanye4King
             public int AnimationId;
             public int BlurRadius;
         }
-        
+
 
         public void EnableBlur(Window window)
         {
@@ -85,11 +85,12 @@ namespace Kanye4King
         #endregion
 
         #region corners
+
         [DllImport("dwmapi.dll", CharSet = CharSet.Unicode, PreserveSig = false)]
         internal static extern void DwmSetWindowAttribute(IntPtr hwnd,
-                                                 DWMWINDOWATTRIBUTE attribute,
-                                                 ref DWM_WINDOW_CORNER_PREFERENCE pvAttribute,
-                                                 uint cbAttribute);
+            DWMWINDOWATTRIBUTE attribute,
+            ref DWM_WINDOW_CORNER_PREFERENCE pvAttribute,
+            uint cbAttribute);
 
         public enum DWMWINDOWATTRIBUTE
         {
@@ -108,13 +109,16 @@ namespace Kanye4King
         {
             var windowHelper = new WindowInteropHelper(window);
             var preference = DWM_WINDOW_CORNER_PREFERENCE.DWMWCP_ROUND;
-            DwmSetWindowAttribute(windowHelper.Handle, DWMWINDOWATTRIBUTE.DWMWA_WINDOW_CORNER_PREFERENCE, ref preference, sizeof(uint));
+            DwmSetWindowAttribute(windowHelper.Handle, DWMWINDOWATTRIBUTE.DWMWA_WINDOW_CORNER_PREFERENCE,
+                ref preference, sizeof(uint));
         }
+
         #endregion
 
         public static string ExeDirectory => getExePath();
 
         static string dir;
+
         static string getExePath()
         {
             if (dir is not null) return dir;
@@ -136,12 +140,13 @@ namespace Kanye4King
             {
                 EnableBlur(window);
                 window.Activated += Window_Activated;
-                window.Deactivated += Window_Deactivated; 
+                window.Deactivated += Window_Deactivated;
                 //EnableRoundedCorners(window);
             }
         }
 
         public static bool snow = true;
+
         private void Window_Activated(object? sender, EventArgs e)
         {
             if (sender is Window w)
@@ -174,13 +179,15 @@ namespace Kanye4King
         {
             try
             {
-                if (sender is Window w && w.Template.FindName("mainddd", w) is Grid grid && grid.Children.Count > 0 && grid.Children[0] is Snowfall sf)
+                if (sender is Window w && w.Template.FindName("mainddd", w) is Grid grid && grid.Children.Count > 0 &&
+                    grid.Children[0] is Snowfall sf)
                 {
                     sf._timer.Stop();
                 }
             }
             catch (Exception)
-            {}
+            {
+            }
         }
 
         private void BorderMouseDown(object sender, MouseButtonEventArgs e)
