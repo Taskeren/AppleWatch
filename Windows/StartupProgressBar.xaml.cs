@@ -159,6 +159,7 @@ namespace Kanye4King
 
                     Instance.Dispatcher.Invoke(() => TaskDescription.Content = "Cleaning up temp files");
                     using var db = new Kanye4KingDbContext();
+                    db.DropAll();
                     db.Database.ExecuteSql(System.Runtime.CompilerServices.FormattableStringFactory.Create("VACUUM;"));
 
                     if (Directory.Exists("temp"))

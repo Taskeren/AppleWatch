@@ -1,11 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Kanye4King.Database
 {
@@ -18,7 +11,6 @@ namespace Kanye4King.Database
 
         public Kanye4KingDbContext()
         {
-            Database.EnsureDeleted();
             Database.EnsureCreated();
         }
 
@@ -34,6 +26,12 @@ namespace Kanye4King.Database
 
             modelBuilder.Entity<DbLog>().ToTable("log");
             modelBuilder.Entity<DbLog>().HasIndex(m => m.CreatedAt);
+        }
+
+        public void DropAll()
+        {
+            Log.ExecuteDelete();
+            Packets.ExecuteDelete();
         }
     }
 }
