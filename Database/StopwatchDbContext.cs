@@ -18,6 +18,7 @@ namespace Kanye4King.Database
 
         public Kanye4KingDbContext()
         {
+            Database.EnsureDeleted();
             Database.EnsureCreated();
         }
 
