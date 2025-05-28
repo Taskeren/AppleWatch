@@ -14,6 +14,7 @@
     <PackageId></PackageId>
     <Company />
     <Product />
+    <AssemblyName>AppleWatchSilicon</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
